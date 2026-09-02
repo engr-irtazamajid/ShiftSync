@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: shiftsync-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install && npm run build --workspace=packages/shared && npm run build --workspace=server
+    startCommand: node server/dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: MONGO_URI
+        sync: false
+      - key: ACCESS_TOKEN_SECRET
+        generateValue: true
+      - key: REFRESH_TOKEN_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_TTL
+        value: 15m
+      - key: REFRESH_TOKEN_TTL_DAYS
+        value: 7
+      - key: SHIFT_EDIT_CUTOFF_HOURS
+        value: 48
+      - key: SEED_PASSWORD
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false
+
+  - type: web
+    name: shiftsync-client
+    runtime: static
+    rootDir: .
+    buildCommand: npm install && npm run build --workspace=packages/shared && npm run build --workspace=client
+    staticPublishPath: client/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+      - key: VITE_SOCKET_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
