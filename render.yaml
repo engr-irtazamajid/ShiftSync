@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     rootDir: .
-    buildCommand: npm ci && server/node_modules/.bin/tsc --version && npm run build --workspace=packages/shared && server/node_modules/.bin/tsc -b server/tsconfig.json
+    buildCommand: npm ci --include=dev && npm run build --workspace=packages/shared && npm run build --workspace=server
     startCommand: node server/dist/index.js
     envVars:
       - key: NODE_ENV
@@ -32,7 +32,7 @@ services:
     name: shiftsync-client
     runtime: static
     rootDir: .
-    buildCommand: npm ci && npm run build --workspace=packages/shared && npm run build --workspace=client
+    buildCommand: npm ci --include=dev && npm run build --workspace=packages/shared && npm run build --workspace=client
     staticPublishPath: client/dist
     envVars:
       - key: VITE_API_URL
