@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     rootDir: .
-    buildCommand: npm ci && npm run build --workspace=packages/shared && npm run build --workspace=server
+    buildCommand: npm ci && server/node_modules/.bin/tsc --version && npm run build --workspace=packages/shared && server/node_modules/.bin/tsc -b server/tsconfig.json
     startCommand: node server/dist/index.js
     envVars:
       - key: NODE_ENV
