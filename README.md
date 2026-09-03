@@ -161,5 +161,14 @@ The seed script deliberately plants these scenarios for evaluation:
 - There is no admin UI screen for creating new users (managers/staff) or certifying staff at a location — those operations are fully implemented and enforced server-side (`POST /users`, `POST /users/:id/certifications`, both role-scoped) and are exercised by the seed script, but onboarding a new hire currently requires a direct API call rather than a form. The assessment's scope centers on scheduling, constraint enforcement, swaps, and real-time behavior rather than admin CRUD tooling, so this was deliberately left out of the UI to focus effort on the higher-weighted areas.
 
 
-##Project UI SS
+## Project UI
 ![alt text](image.png)
+<img width="1375" height="916" alt="image" src="https://github.com/user-attachments/assets/e1156775-8db7-4990-bfff-d8615d71f9cd" />
+<img width="1399" height="942" alt="image" src="https://github.com/user-attachments/assets/461f525c-f6e1-4f75-a9a0-114953aab706" />
+<img width="1372" height="981" alt="image" src="https://github.com/user-attachments/assets/00b7ea30-1977-48c8-9ff4-f3c67bd5ee6b" />
+<img width="406" height="454" alt="image" src="https://github.com/user-attachments/assets/495037cf-6c89-4371-aaa2-a97d778c4ba7" />
+<img width="1492" height="384" alt="image" src="https://github.com/user-attachments/assets/505f44cb-a63b-4676-9f5c-9905ab912f31" />
+
+
+
+
