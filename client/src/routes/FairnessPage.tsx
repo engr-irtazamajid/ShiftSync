@@ -57,9 +57,7 @@ export function FairnessPage() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Premium shifts{" "}
-              {currentLocation &&
-                weekKey &&
-                `· ${weekKeyLabel(weekKey, currentLocation.timezone)}`}
+              {currentLocation && weekKey && `· ${weekKeyLabel(weekKey, currentLocation.timezone)}`}
             </CardTitle>
             {fairness && (
               <Badge

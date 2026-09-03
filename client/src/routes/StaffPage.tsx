@@ -30,10 +30,7 @@ export function StaffPage() {
               {staff.map((member) => (
                 <tr key={member.id} className="border-b last:border-0 hover:bg-muted/30">
                   <td className="p-0">
-                    <Link
-                      to={`/staff/${member.id}/availability`}
-                      className="block p-3 font-medium"
-                    >
+                    <Link to={`/staff/${member.id}/availability`} className="block p-3 font-medium">
                       {member.firstName} {member.lastName}
                     </Link>
                   </td>

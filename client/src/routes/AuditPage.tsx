@@ -30,12 +30,7 @@ export function AuditPage() {
   const from = DateTime.now().minus({ days: 30 }).toISODate() ?? "";
   const to = DateTime.now().toISODate() ?? "";
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useAuditLog({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useAuditLog({
     locationId: selectedLocationId ?? undefined,
     from,
     to,
@@ -123,11 +118,7 @@ export function AuditPage() {
 
       {hasNextPage && (
         <div className="flex justify-center">
-          <Button
-            variant="outline"
-            disabled={isFetchingNextPage}
-            onClick={() => fetchNextPage()}
-          >
+          <Button variant="outline" disabled={isFetchingNextPage} onClick={() => fetchNextPage()}>
             {isFetchingNextPage ? "Loading..." : "Load more"}
           </Button>
         </div>
