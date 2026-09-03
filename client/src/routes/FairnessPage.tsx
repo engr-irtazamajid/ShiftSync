@@ -1,8 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocations } from "@/api/locations";
 import { useFairness, useUnderOverScheduled } from "@/api/analytics";
 import { useUiStore } from "@/stores/uiStore";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { currentWeekKey, weekKeyLabel } from "@/lib/time";
@@ -10,7 +16,6 @@ import { currentWeekKey, weekKeyLabel } from "@/lib/time";
 export function FairnessPage() {
   const { data: locations = [] } = useLocations();
   const { selectedLocationId, setSelectedLocationId } = useUiStore();
-  const [weekKey, setWeekKey] = useState("");
 
   useEffect(() => {
     if (!selectedLocationId && locations.length > 0) {
@@ -18,14 +23,8 @@ export function FairnessPage() {
     }
   }, [locations, selectedLocationId, setSelectedLocationId]);
 
-  useEffect(() => {
-    if (!weekKey && selectedLocationId) {
-      const location = locations.find((l) => l.id === selectedLocationId);
-      setWeekKey(currentWeekKey(location?.timezone ?? "UTC"));
-    }
-  }, [selectedLocationId, locations, weekKey]);
-
   const currentLocation = locations.find((l) => l.id === selectedLocationId);
+  const weekKey = currentLocation ? currentWeekKey(currentLocation.timezone) : "";
 
   const { data: fairness } = useFairness({ locationId: selectedLocationId ?? undefined, weekKey });
   const { data: underOver = [] } = useUnderOverScheduled({
@@ -56,7 +55,9 @@ export function FairnessPage() {
           <div>
             <CardTitle>
               Premium shift distribution
-              {currentLocation && weekKey && ` — ${weekKeyLabel(weekKey, currentLocation.timezone)}`}
+              {currentLocation &&
+                weekKey &&
+                ` — ${weekKeyLabel(weekKey, currentLocation.timezone)}`}
             </CardTitle>
           </div>
           {fairness && (
@@ -69,7 +70,9 @@ export function FairnessPage() {
           {(fairness?.entries ?? []).map((entry) => (
             <div key={entry.staffId} className="flex items-center justify-between text-sm">
               <span>{entry.name}</span>
-              <span className="text-muted-foreground">{entry.premiumHours.toFixed(1)}h premium (Fri/Sat evening)</span>
+              <span className="text-muted-foreground">
+                {entry.premiumHours.toFixed(1)}h premium (Fri/Sat evening)
+              </span>
             </div>
           ))}
           {(fairness?.entries ?? []).length === 0 && (

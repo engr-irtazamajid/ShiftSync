@@ -6,7 +6,9 @@ export function useNotifications() {
   return useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
-      const response = await apiClient.get<{ notifications: NotificationDTO[] }>("/api/notifications");
+      const response = await apiClient.get<{ notifications: NotificationDTO[] }>(
+        "/api/notifications"
+      );
       return response.data.notifications;
     },
     select: (notifications) => notifications.filter(Boolean),
@@ -52,7 +54,10 @@ export function useNotificationPreferences() {
 export function useUpdateNotificationPreferences() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: { emailSimEnabled: boolean; mutedTypes: NotificationPreferenceDTO["mutedTypes"] }) => {
+    mutationFn: async (payload: {
+      emailSimEnabled: boolean;
+      mutedTypes: NotificationPreferenceDTO["mutedTypes"];
+    }) => {
       const response = await apiClient.put<{ preference: NotificationPreferenceDTO }>(
         "/api/notification-preferences",
         payload

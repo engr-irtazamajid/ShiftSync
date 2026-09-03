@@ -19,16 +19,19 @@ function issueTokenPair(user: UserDocument): TokenPair {
     role: user.role,
     managedLocationIds,
   });
-  const refreshToken = jwt.sign(
-    { sub: user.id.toString() },
-    env.refreshTokenSecret,
-    { expiresIn: `${env.refreshTokenTtlDays}d` }
-  );
+  const refreshToken = jwt.sign({ sub: user.id.toString() }, env.refreshTokenSecret, {
+    expiresIn: `${env.refreshTokenTtlDays}d`,
+  });
   return { accessToken, refreshToken };
 }
 
-export async function login(email: string, password: string): Promise<{ tokens: TokenPair; user: UserDocument }> {
-  const user = await UserModel.findOne({ email: email.toLowerCase() }).select("+passwordHash +refreshTokenHash");
+export async function login(
+  email: string,
+  password: string
+): Promise<{ tokens: TokenPair; user: UserDocument }> {
+  const user = await UserModel.findOne({ email: email.toLowerCase() }).select(
+    "+passwordHash +refreshTokenHash"
+  );
   if (!user || !user.isActive) {
     throw new AppError(401, "INVALID_CREDENTIALS", "Invalid email or password");
   }
@@ -45,7 +48,9 @@ export async function login(email: string, password: string): Promise<{ tokens: 
   return { tokens, user };
 }
 
-export async function refresh(refreshToken: string): Promise<{ tokens: TokenPair; user: UserDocument }> {
+export async function refresh(
+  refreshToken: string
+): Promise<{ tokens: TokenPair; user: UserDocument }> {
   let payload: { sub: string };
   try {
     payload = jwt.verify(refreshToken, env.refreshTokenSecret) as { sub: string };

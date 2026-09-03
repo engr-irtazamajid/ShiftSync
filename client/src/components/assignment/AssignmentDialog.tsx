@@ -8,7 +8,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ViolationList } from "./ViolationList";
 import { useUsers } from "@/api/users";
@@ -96,7 +102,9 @@ export function AssignmentDialog({ shift, open, onOpenChange, isAdmin }: Assignm
             </SelectContent>
           </Select>
 
-          {preview.isPending && <p className="text-sm text-muted-foreground">Checking constraints...</p>}
+          {preview.isPending && (
+            <p className="text-sm text-muted-foreground">Checking constraints...</p>
+          )}
 
           {preview.data && (
             <>

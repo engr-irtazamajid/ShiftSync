@@ -40,7 +40,7 @@ export function SwapsPage() {
   const approve = useApproveSwap();
   const deny = useDenySwap();
 
-  const incoming = incomingSwaps.data ?? [];
+  const incoming = useMemo(() => incomingSwaps.data ?? [], [incomingSwaps.data]);
 
   const allVisibleSwaps = useMemo<SwapRequestDTO[]>(
     () => [...(mine.data ?? []), ...incoming, ...(drops.data ?? []), ...(approvals.data ?? [])],
@@ -78,9 +78,11 @@ export function SwapsPage() {
 
       map.set(swap.id, {
         requesterName: staffById.get(swap.requestedBy) ?? "Unknown staff",
-        targetName: swap.targetStaffId ? staffById.get(swap.targetStaffId) ?? "Unknown staff" : null,
-        claimantName: swap.claimedBy ? staffById.get(swap.claimedBy) ?? "Unknown staff" : null,
-        skillName: shift ? skillById.get(shift.requiredSkillId) ?? null : null,
+        targetName: swap.targetStaffId
+          ? (staffById.get(swap.targetStaffId) ?? "Unknown staff")
+          : null,
+        claimantName: swap.claimedBy ? (staffById.get(swap.claimedBy) ?? "Unknown staff") : null,
+        skillName: shift ? (skillById.get(shift.requiredSkillId) ?? null) : null,
         locationName: location?.name ?? null,
         shiftStartUtc: shift?.startUtc ?? null,
         shiftEndUtc: shift?.endUtc ?? null,
@@ -104,14 +106,17 @@ export function SwapsPage() {
 
         {!isManager && (
           <TabsContent value="outgoing" className="space-y-2">
-            {(mine.data ?? []).length === 0 && <p className="text-sm text-muted-foreground">No requests yet.</p>}
+            {(mine.data ?? []).length === 0 && (
+              <p className="text-sm text-muted-foreground">No requests yet.</p>
+            )}
             {(mine.data ?? []).map((swap) => (
               <SwapCard
                 key={swap.id}
                 swap={swap}
                 details={detailsBySwapId.get(swap.id)}
                 actions={
-                  swap.status !== SwapStatus.PendingManagerApproval && OPEN_SWAP_STATUSES.includes(swap.status)
+                  swap.status !== SwapStatus.PendingManagerApproval &&
+                  OPEN_SWAP_STATUSES.includes(swap.status)
                     ? [
                         {
                           label: "Withdraw",
@@ -128,7 +133,9 @@ export function SwapsPage() {
 
         {!isManager && (
           <TabsContent value="incoming" className="space-y-2">
-            {incoming.length === 0 && <p className="text-sm text-muted-foreground">Nothing pending.</p>}
+            {incoming.length === 0 && (
+              <p className="text-sm text-muted-foreground">Nothing pending.</p>
+            )}
             {incoming.map((swap) => (
               <SwapCard
                 key={swap.id}
@@ -136,7 +143,11 @@ export function SwapsPage() {
                 details={detailsBySwapId.get(swap.id)}
                 actions={[
                   { label: "Accept", onClick: () => accept.mutate({ id: swap.id }) },
-                  { label: "Reject", variant: "outline", onClick: () => reject.mutate({ id: swap.id }) },
+                  {
+                    label: "Reject",
+                    variant: "outline",
+                    onClick: () => reject.mutate({ id: swap.id }),
+                  },
                 ]}
               />
             ))}
@@ -153,9 +164,7 @@ export function SwapsPage() {
               swap={swap}
               details={detailsBySwapId.get(swap.id)}
               actions={
-                !isManager
-                  ? [{ label: "Claim", onClick: () => claim.mutate({ id: swap.id }) }]
-                  : []
+                !isManager ? [{ label: "Claim", onClick: () => claim.mutate({ id: swap.id }) }] : []
               }
             />
           ))}

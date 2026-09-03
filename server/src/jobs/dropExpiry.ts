@@ -52,7 +52,6 @@ export async function sweepExpiredDrops(): Promise<number> {
 export function startDropExpiryJob(): NodeJS.Timeout {
   return setInterval(() => {
     sweepExpiredDrops().catch((err) => {
-      // eslint-disable-next-line no-console
       console.error("drop expiry sweep failed", err);
     });
   }, SWEEP_INTERVAL_MS);

@@ -78,10 +78,7 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
       locationId: requestedLocationId,
       revokedAt: null,
     }).distinct("staffId");
-    filter.$or = [
-      { _id: { $in: certifiedStaffIds } },
-      { managedLocationIds: requestedLocationId },
-    ];
+    filter.$or = [{ _id: { $in: certifiedStaffIds } }, { managedLocationIds: requestedLocationId }];
   }
 
   const users = await UserModel.find(filter).sort({ lastName: 1, firstName: 1 });

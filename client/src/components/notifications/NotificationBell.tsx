@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Bell } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from "@/api/notifications";
+import {
+  useNotifications,
+  useMarkNotificationRead,
+  useMarkAllNotificationsRead,
+} from "@/api/notifications";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -56,7 +60,9 @@ export function NotificationBell() {
             )}
           </div>
           {notifications.length === 0 && (
-            <p className="px-2 py-4 text-center text-sm text-muted-foreground">No notifications yet.</p>
+            <p className="px-2 py-4 text-center text-sm text-muted-foreground">
+              No notifications yet.
+            </p>
           )}
           {notifications.map((notification) => (
             <button

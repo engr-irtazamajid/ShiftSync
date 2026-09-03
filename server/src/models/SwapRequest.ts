@@ -40,7 +40,4 @@ swapRequestSchema.index({ requestedBy: 1, status: 1 });
 swapRequestSchema.index({ assignmentId: 1, status: 1 });
 swapRequestSchema.index({ type: 1, status: 1, expiresAt: 1 });
 
-export const SwapRequestModel = model<SwapRequestShape>(
-  "SwapRequest",
-  swapRequestSchema
-);
+export const SwapRequestModel = model<SwapRequestShape>("SwapRequest", swapRequestSchema);

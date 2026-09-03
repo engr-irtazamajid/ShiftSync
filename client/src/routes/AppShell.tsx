@@ -26,7 +26,9 @@ export function AppShell() {
   const user = useAuthStore((state) => state.user);
   const logout = useLogout();
 
-  const visibleItems = NAV_ITEMS.filter((item) => !item.roles || (user && item.roles.includes(user.role)));
+  const visibleItems = NAV_ITEMS.filter(
+    (item) => !item.roles || (user && item.roles.includes(user.role))
+  );
 
   return (
     <div className="flex min-h-screen flex-col">

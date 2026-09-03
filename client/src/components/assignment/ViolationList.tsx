@@ -11,9 +11,7 @@ interface ViolationListProps {
 export function ViolationList({ result, onSelectAlternative }: ViolationListProps) {
   if (result.passed && result.warnings.length === 0) {
     return (
-      <p className="text-sm text-emerald-700">
-        All scheduling rules pass — no conflicts detected.
-      </p>
+      <p className="text-sm text-emerald-700">All scheduling rules pass — no conflicts detected.</p>
     );
   }
 
@@ -60,7 +58,11 @@ export function ViolationList({ result, onSelectAlternative }: ViolationListProp
                   <p className="text-xs text-muted-foreground">{alternative.reason}</p>
                 </div>
                 {onSelectAlternative && (
-                  <Button size="sm" variant="outline" onClick={() => onSelectAlternative(alternative)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onSelectAlternative(alternative)}
+                  >
                     Assign instead
                   </Button>
                 )}

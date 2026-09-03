@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocations } from "@/api/locations";
 import { useOtDashboard } from "@/api/analytics";
 import { useUiStore } from "@/stores/uiStore";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { currentWeekKey } from "@/lib/time";
 
 export function OtDashboardPage() {
   const { data: locations = [] } = useLocations();
-  const { selectedLocationId, setSelectedLocationId, selectedWeekKey, setSelectedWeekKey } = useUiStore();
-  const [weekKey, setWeekKey] = useState(selectedWeekKey ?? "");
+  const { selectedLocationId, setSelectedLocationId, setSelectedWeekKey } = useUiStore();
 
   useEffect(() => {
     if (!selectedLocationId && locations.length > 0) {
@@ -18,16 +23,17 @@ export function OtDashboardPage() {
     }
   }, [locations, selectedLocationId, setSelectedLocationId]);
 
-  useEffect(() => {
-    if (!weekKey && selectedLocationId) {
-      const location = locations.find((l) => l.id === selectedLocationId);
-      const key = currentWeekKey(location?.timezone ?? "UTC");
-      setWeekKey(key);
-      setSelectedWeekKey(key);
-    }
-  }, [selectedLocationId, locations, weekKey, setSelectedWeekKey]);
+  const currentLocation = locations.find((l) => l.id === selectedLocationId);
+  const weekKey = currentLocation ? currentWeekKey(currentLocation.timezone) : "";
 
-  const { data: rows = [] } = useOtDashboard({ locationId: selectedLocationId ?? undefined, weekKey });
+  useEffect(() => {
+    if (weekKey) setSelectedWeekKey(weekKey);
+  }, [weekKey, setSelectedWeekKey]);
+
+  const { data: rows = [] } = useOtDashboard({
+    locationId: selectedLocationId ?? undefined,
+    weekKey,
+  });
 
   return (
     <div className="space-y-4">
@@ -69,7 +75,11 @@ export function OtDashboardPage() {
                   <td className="p-3">
                     <Badge
                       variant={
-                        row.status === "block" ? "destructive" : row.status === "warn" ? "warning" : "success"
+                        row.status === "block"
+                          ? "destructive"
+                          : row.status === "warn"
+                            ? "warning"
+                            : "success"
                       }
                     >
                       {row.status}

@@ -19,8 +19,16 @@ const replaceRecurringSchema = z.object({
 const exceptionSchema = z.object({
   exceptionDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   isUnavailable: z.boolean(),
-  exceptionStartLocalTime: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
-  exceptionEndLocalTime: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
+  exceptionStartLocalTime: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .nullable()
+    .optional(),
+  exceptionEndLocalTime: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .nullable()
+    .optional(),
 });
 
 export async function listAvailability(req: Request, res: Response): Promise<void> {
@@ -59,8 +67,8 @@ export async function addAvailabilityException(req: Request, res: Response): Pro
     type: AvailabilityType.Exception,
     exceptionDate: body.exceptionDate,
     isUnavailable: body.isUnavailable,
-    exceptionStartLocalTime: body.isUnavailable ? null : body.exceptionStartLocalTime ?? null,
-    exceptionEndLocalTime: body.isUnavailable ? null : body.exceptionEndLocalTime ?? null,
+    exceptionStartLocalTime: body.isUnavailable ? null : (body.exceptionStartLocalTime ?? null),
+    exceptionEndLocalTime: body.isUnavailable ? null : (body.exceptionEndLocalTime ?? null),
   });
   res.status(201).json({ availability: toAvailabilityDTO(entry) });
 

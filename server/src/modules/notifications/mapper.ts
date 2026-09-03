@@ -17,7 +17,9 @@ export function toNotificationDTO(n: NotificationDocument): NotificationDTO {
   };
 }
 
-export function toNotificationPreferenceDTO(p: NotificationPreferenceDocument): NotificationPreferenceDTO {
+export function toNotificationPreferenceDTO(
+  p: NotificationPreferenceDocument
+): NotificationPreferenceDTO {
   return {
     userId: p.userId.toString(),
     emailSimEnabled: p.emailSimEnabled,

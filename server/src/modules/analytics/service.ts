@@ -41,7 +41,10 @@ export interface HoursDistributionEntry {
   premiumHours: number;
 }
 
-export async function hoursDistribution(locationId: string | undefined, weekKey: string): Promise<HoursDistributionEntry[]> {
+export async function hoursDistribution(
+  locationId: string | undefined,
+  weekKey: string
+): Promise<HoursDistributionEntry[]> {
   const staff = await UserModel.find({ isActive: true, role: Role.Staff });
   const staffIds = staff.map((s) => s.id.toString());
   const shiftsByStaff = await activeShiftsForStaffInWeek(staffIds, weekKey);
@@ -51,7 +54,9 @@ export async function hoursDistribution(locationId: string | undefined, weekKey:
       (sh) => !locationId || sh.locationId.toString() === locationId
     );
     const totalHours = shifts.reduce((sum, sh) => sum + shiftHours(sh), 0);
-    const premiumHours = shifts.filter((sh) => sh.isPremium).reduce((sum, sh) => sum + shiftHours(sh), 0);
+    const premiumHours = shifts
+      .filter((sh) => sh.isPremium)
+      .reduce((sum, sh) => sum + shiftHours(sh), 0);
     return {
       staffId: s.id.toString(),
       name: `${s.firstName} ${s.lastName}`,
@@ -81,7 +86,10 @@ export interface FairnessReport {
  * simple max/min ratio breaks down whenever any staff member has zero
  * premium hours.
  */
-export async function fairnessReport(locationId: string | undefined, weekKey: string): Promise<FairnessReport> {
+export async function fairnessReport(
+  locationId: string | undefined,
+  weekKey: string
+): Promise<FairnessReport> {
   const staff = await UserModel.find({ isActive: true, role: Role.Staff });
   const staffIds = staff.map((s) => s.id.toString());
   const shiftsByStaff = await activeShiftsForStaffInWeek(staffIds, weekKey);
@@ -90,7 +98,9 @@ export async function fairnessReport(locationId: string | undefined, weekKey: st
     const shifts = (shiftsByStaff.get(s.id.toString()) ?? []).filter(
       (sh) => !locationId || sh.locationId.toString() === locationId
     );
-    const premiumHours = shifts.filter((sh) => sh.isPremium).reduce((sum, sh) => sum + shiftHours(sh), 0);
+    const premiumHours = shifts
+      .filter((sh) => sh.isPremium)
+      .reduce((sum, sh) => sum + shiftHours(sh), 0);
     return { staffId: s.id.toString(), name: `${s.firstName} ${s.lastName}`, premiumHours };
   });
 
@@ -116,7 +126,10 @@ export interface UnderOverEntry {
   delta: number;
 }
 
-export async function underOverScheduled(locationId: string | undefined, weekKey: string): Promise<UnderOverEntry[]> {
+export async function underOverScheduled(
+  locationId: string | undefined,
+  weekKey: string
+): Promise<UnderOverEntry[]> {
   const staff = await UserModel.find({ isActive: true, desiredWeeklyHours: { $ne: null } });
   const staffIds = staff.map((s) => s.id.toString());
   const shiftsByStaff = await activeShiftsForStaffInWeek(staffIds, weekKey);
@@ -146,7 +159,10 @@ export interface OtDashboardEntry {
   status: "ok" | "warn" | "block";
 }
 
-export async function otDashboard(locationId: string | undefined, weekKey: string): Promise<OtDashboardEntry[]> {
+export async function otDashboard(
+  locationId: string | undefined,
+  weekKey: string
+): Promise<OtDashboardEntry[]> {
   const staff = await UserModel.find({ isActive: true, role: Role.Staff });
   const staffIds = staff.map((s) => s.id.toString());
   const shiftsByStaff = await activeShiftsForStaffInWeek(staffIds, weekKey);

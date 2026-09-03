@@ -25,7 +25,4 @@ const certificationSchema = new Schema<CertificationShape>(
 
 certificationSchema.index({ staffId: 1, locationId: 1, revokedAt: 1 });
 
-export const CertificationModel = model<CertificationShape>(
-  "Certification",
-  certificationSchema
-);
+export const CertificationModel = model<CertificationShape>("Certification", certificationSchema);

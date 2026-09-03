@@ -9,7 +9,13 @@ import { ScheduleGrid } from "@/components/schedule/ScheduleGrid";
 import { CreateShiftDialog } from "@/components/schedule/CreateShiftDialog";
 import { OnDutyNowPanel } from "@/components/schedule/OnDutyNowPanel";
 import { ShiftStatus } from "@shiftsync/shared";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { currentWeekKey, shiftWeekKey, weekKeyLabel } from "@/lib/time";
@@ -23,7 +29,9 @@ export function SchedulePage() {
   const { selectedLocationId, setSelectedLocationId, setSelectedWeekKey } = useUiStore();
 
   const visibleLocations =
-    user?.role === Role.Manager ? locations.filter((l) => user.managedLocationIds.includes(l.id)) : locations;
+    user?.role === Role.Manager
+      ? locations.filter((l) => user.managedLocationIds.includes(l.id))
+      : locations;
 
   const rememberedLocationId = visibleLocations.find((l) => l.id === selectedLocationId)?.id;
   const locationId = params.locationId ?? rememberedLocationId ?? visibleLocations[0]?.id;
@@ -46,7 +54,9 @@ export function SchedulePage() {
   const unpublish = useUnpublishSchedule();
 
   const canManage =
-    user?.role === Role.Admin || (user?.role === Role.Manager && Boolean(location && user.managedLocationIds.includes(location.id)));
+    user?.role === Role.Admin ||
+    (user?.role === Role.Manager &&
+      Boolean(location && user.managedLocationIds.includes(location.id)));
 
   const draftCount = shifts.filter((s) => s.status === ShiftStatus.Draft).length;
   const publishedCount = shifts.filter((s) => s.status === ShiftStatus.Published).length;
@@ -94,9 +104,7 @@ export function SchedulePage() {
           <div className="flex items-center gap-2">
             {shifts.length > 0 && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                {hasPublished && (
-                  <Badge variant="success">{publishedCount} published</Badge>
-                )}
+                {hasPublished && <Badge variant="success">{publishedCount} published</Badge>}
                 {hasDrafts && <Badge variant="outline">{draftCount} draft</Badge>}
               </div>
             )}

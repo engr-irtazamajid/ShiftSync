@@ -88,9 +88,12 @@ export function useOtDashboard(params: { locationId?: string; weekKey?: string }
   return useQuery({
     queryKey: ["analytics", "ot-dashboard", params],
     queryFn: async () => {
-      const response = await apiClient.get<{ entries: OtDashboardEntry[] }>("/api/analytics/ot-dashboard", {
-        params,
-      });
+      const response = await apiClient.get<{ entries: OtDashboardEntry[] }>(
+        "/api/analytics/ot-dashboard",
+        {
+          params,
+        }
+      );
       return response.data.entries;
     },
     enabled: Boolean(params.weekKey),
@@ -101,9 +104,12 @@ export function useOnDutyNow(locationId: string | undefined) {
   return useQuery({
     queryKey: ["on-duty-now", locationId],
     queryFn: async () => {
-      const response = await apiClient.get<{ entries: OnDutyEntry[] }>("/api/analytics/on-duty-now", {
-        params: { locationId },
-      });
+      const response = await apiClient.get<{ entries: OnDutyEntry[] }>(
+        "/api/analytics/on-duty-now",
+        {
+          params: { locationId },
+        }
+      );
       return response.data.entries;
     },
     enabled: Boolean(locationId),

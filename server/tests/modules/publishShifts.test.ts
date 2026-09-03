@@ -1,7 +1,13 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import { Role, ShiftStatus, AssignmentStatus, NotificationType, AuditAction } from "@shiftsync/shared";
+import {
+  Role,
+  ShiftStatus,
+  AssignmentStatus,
+  NotificationType,
+  AuditAction,
+} from "@shiftsync/shared";
 import { UserModel } from "../../src/models/User";
 import { LocationModel } from "../../src/models/Location";
 import { SkillModel } from "../../src/models/Skill";
@@ -85,7 +91,11 @@ describe("publishShifts / unpublishShifts", () => {
   it("flips draft shifts to published and notifies assigned staff", async () => {
     const { location, manager, staff, shift, weekKey } = await makeFixtures();
 
-    const publishedIds = await publishShifts(location.id.toString(), weekKey, manager.id.toString());
+    const publishedIds = await publishShifts(
+      location.id.toString(),
+      weekKey,
+      manager.id.toString()
+    );
     expect(publishedIds).toEqual([shift.id.toString()]);
 
     const reloaded = await ShiftModel.findById(shift._id);
@@ -97,7 +107,10 @@ describe("publishShifts / unpublishShifts", () => {
     });
     expect(notifications).toHaveLength(1);
 
-    const auditRows = await AuditLogModel.find({ entityId: shift._id, action: AuditAction.Publish });
+    const auditRows = await AuditLogModel.find({
+      entityId: shift._id,
+      action: AuditAction.Publish,
+    });
     expect(auditRows).toHaveLength(1);
   });
 
@@ -105,7 +118,11 @@ describe("publishShifts / unpublishShifts", () => {
     const { location, manager, staff, shift, weekKey } = await makeFixtures();
     await publishShifts(location.id.toString(), weekKey, manager.id.toString());
 
-    const unpublishedIds = await unpublishShifts(location.id.toString(), weekKey, manager.id.toString());
+    const unpublishedIds = await unpublishShifts(
+      location.id.toString(),
+      weekKey,
+      manager.id.toString()
+    );
     expect(unpublishedIds).toEqual([shift.id.toString()]);
 
     const reloaded = await ShiftModel.findById(shift._id);
@@ -130,7 +147,11 @@ describe("publishShifts / unpublishShifts", () => {
       skillIds: [],
     });
 
-    const publishedIds = await publishShifts(location.id.toString(), "2026-W99", manager.id.toString());
+    const publishedIds = await publishShifts(
+      location.id.toString(),
+      "2026-W99",
+      manager.id.toString()
+    );
     expect(publishedIds).toEqual([]);
   });
 });

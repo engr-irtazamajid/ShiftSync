@@ -44,11 +44,7 @@ router.patch("/:id", authorize(Role.Admin, Role.Manager), asyncHandler(updateShi
 router.delete("/:id", authorize(Role.Admin, Role.Manager), asyncHandler(cancelShift));
 router.get("/:id/history", authorize(Role.Admin, Role.Manager), asyncHandler(getShiftHistory));
 
-router.post(
-  "/:shiftId/assign",
-  authorize(Role.Admin, Role.Manager),
-  asyncHandler(assignStaff)
-);
+router.post("/:shiftId/assign", authorize(Role.Admin, Role.Manager), asyncHandler(assignStaff));
 router.post(
   "/:shiftId/preview-assignment",
   authorize(Role.Admin, Role.Manager),

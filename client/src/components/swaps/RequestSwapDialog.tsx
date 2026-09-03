@@ -9,7 +9,13 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useUsers } from "@/api/users";
 import { useAuthStore } from "@/stores/authStore";
@@ -24,7 +30,13 @@ interface RequestSwapDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function RequestSwapDialog({ shift, assignment, timezone, open, onOpenChange }: RequestSwapDialogProps) {
+export function RequestSwapDialog({
+  shift,
+  assignment,
+  timezone,
+  open,
+  onOpenChange,
+}: RequestSwapDialogProps) {
   const user = useAuthStore((state) => state.user);
   const { data: staff = [] } = useUsers({ role: "staff" });
   const [mode, setMode] = useState<"swap" | "drop">("swap");
@@ -69,8 +81,9 @@ export function RequestSwapDialog({ shift, assignment, timezone, open, onOpenCha
 
           <TabsContent value="swap" className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Pick a coworker to offer this shift to. They'll need to accept, then your manager approves the swap
-              before it takes effect — your original assignment stays in place until then.
+              Pick a coworker to offer this shift to. They'll need to accept, then your manager
+              approves the swap before it takes effect — your original assignment stays in place
+              until then.
             </p>
             <Select value={targetStaffId} onValueChange={setTargetStaffId}>
               <SelectTrigger>
@@ -88,9 +101,9 @@ export function RequestSwapDialog({ shift, assignment, timezone, open, onOpenCha
 
           <TabsContent value="drop" className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              This shift will be offered to any qualified staff member who can claim it. If nobody claims it within
-              24 hours of the shift start, the drop request expires automatically. Your manager still has to
-              approve the final change — you stay assigned until then.
+              This shift will be offered to any qualified staff member who can claim it. If nobody
+              claims it within 24 hours of the shift start, the drop request expires automatically.
+              Your manager still has to approve the final change — you stay assigned until then.
             </p>
           </TabsContent>
         </Tabs>
@@ -103,7 +116,11 @@ export function RequestSwapDialog({ shift, assignment, timezone, open, onOpenCha
             onClick={handleSubmit}
             disabled={(mode === "swap" && !targetStaffId) || createSwap.isPending}
           >
-            {createSwap.isPending ? "Submitting..." : mode === "swap" ? "Request swap" : "Request drop"}
+            {createSwap.isPending
+              ? "Submitting..."
+              : mode === "swap"
+                ? "Request swap"
+                : "Request drop"}
           </Button>
         </DialogFooter>
       </DialogContent>

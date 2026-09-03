@@ -14,7 +14,9 @@ export function OnDutyNowPanel({ locationId }: { locationId: string | undefined 
         <Badge variant="success">{onDuty.length} active</Badge>
       </CardHeader>
       <CardContent className="space-y-1">
-        {onDuty.length === 0 && <p className="text-sm text-muted-foreground">No one currently on shift.</p>}
+        {onDuty.length === 0 && (
+          <p className="text-sm text-muted-foreground">No one currently on shift.</p>
+        )}
         {onDuty.map((entry) => (
           <p key={`${entry.staffId}-${entry.shiftId}`} className="text-sm">
             {entry.name}{" "}

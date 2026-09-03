@@ -20,7 +20,9 @@ export interface CreateNotificationInput {
  * inside a transaction can defer the real-time emit until after commit, using
  * emitCreatedNotification below. Callers outside a transaction get the emit for free.
  */
-export async function createNotification(input: CreateNotificationInput): Promise<NotificationDocument | null> {
+export async function createNotification(
+  input: CreateNotificationInput
+): Promise<NotificationDocument | null> {
   const preference = await NotificationPreferenceModel.findOne({ userId: input.userId }).session(
     input.session ?? null
   );
@@ -39,9 +41,7 @@ export async function createNotification(input: CreateNotificationInput): Promis
         title: input.title,
         body: input.body,
         relatedEntityType: input.relatedEntityType ?? null,
-        relatedEntityId: input.relatedEntityId
-          ? new Types.ObjectId(input.relatedEntityId)
-          : null,
+        relatedEntityId: input.relatedEntityId ? new Types.ObjectId(input.relatedEntityId) : null,
         channel,
       },
     ],
@@ -65,5 +65,8 @@ export async function createNotification(input: CreateNotificationInput): Promis
 
 export function emitCreatedNotification(notification: NotificationDocument | null): void {
   if (!notification) return;
-  emitNotificationNew(notification.userId.toString(), toNotificationDTO(notification) as NotificationDTO);
+  emitNotificationNew(
+    notification.userId.toString(),
+    toNotificationDTO(notification) as NotificationDTO
+  );
 }

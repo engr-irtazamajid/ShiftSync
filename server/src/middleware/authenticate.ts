@@ -26,7 +26,9 @@ declare global {
 }
 
 export function signAccessToken(payload: AccessTokenPayload): string {
-  return jwt.sign(payload, env.accessTokenSecret, { expiresIn: env.accessTokenTtl as jwt.SignOptions["expiresIn"] });
+  return jwt.sign(payload, env.accessTokenSecret, {
+    expiresIn: env.accessTokenTtl as jwt.SignOptions["expiresIn"],
+  });
 }
 
 export function verifyAccessToken(token: string): AccessTokenPayload {

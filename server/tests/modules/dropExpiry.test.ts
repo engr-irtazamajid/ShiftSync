@@ -1,7 +1,14 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import { Role, ShiftStatus, AssignmentStatus, SwapType, SwapStatus, NotificationType } from "@shiftsync/shared";
+import {
+  Role,
+  ShiftStatus,
+  AssignmentStatus,
+  SwapType,
+  SwapStatus,
+  NotificationType,
+} from "@shiftsync/shared";
 import { UserModel } from "../../src/models/User";
 import { LocationModel } from "../../src/models/Location";
 import { SkillModel } from "../../src/models/Skill";

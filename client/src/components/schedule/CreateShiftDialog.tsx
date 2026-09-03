@@ -9,7 +9,13 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -95,7 +101,8 @@ export function CreateShiftDialog({ location, skills }: CreateShiftDialogProps) 
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            If end time is earlier than start time, the shift is treated as overnight (ends the next day).
+            If end time is earlier than start time, the shift is treated as overnight (ends the next
+            day).
           </p>
 
           <div className="space-y-1">
@@ -113,10 +120,7 @@ export function CreateShiftDialog({ location, skills }: CreateShiftDialogProps) 
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!skillId || !date || createShift.isPending}
-          >
+          <Button onClick={handleSubmit} disabled={!skillId || !date || createShift.isPending}>
             {createShift.isPending ? "Creating..." : "Create shift"}
           </Button>
         </DialogFooter>

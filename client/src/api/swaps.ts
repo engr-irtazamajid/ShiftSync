@@ -4,7 +4,11 @@ import { apiClient } from "./client";
 import { toast } from "@/stores/toastStore";
 
 interface ApiErrorBody {
-  error: { code: string; message: string; details?: { result?: ConstraintCheckResult; [key: string]: unknown } };
+  error: {
+    code: string;
+    message: string;
+    details?: { result?: ConstraintCheckResult; [key: string]: unknown };
+  };
 }
 
 export function extractErrorMessage(error: unknown): string {
@@ -18,16 +22,20 @@ export function extractErrorMessage(error: unknown): string {
   return body.message || "Something went wrong. Please try again.";
 }
 
-export function useSwaps(params: {
-  requestedBy?: string;
-  targetStaffId?: string;
-  status?: string;
-  type?: string;
-} = {}) {
+export function useSwaps(
+  params: {
+    requestedBy?: string;
+    targetStaffId?: string;
+    status?: string;
+    type?: string;
+  } = {}
+) {
   return useQuery({
     queryKey: ["swaps", params.requestedBy, params.targetStaffId, params.status, params.type],
     queryFn: async () => {
-      const response = await apiClient.get<{ swapRequests: SwapRequestDTO[] }>("/api/swaps", { params });
+      const response = await apiClient.get<{ swapRequests: SwapRequestDTO[] }>("/api/swaps", {
+        params,
+      });
       return response.data.swapRequests;
     },
   });
@@ -36,13 +44,21 @@ export function useSwaps(params: {
 export function useCreateSwap() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: { type: "swap" | "drop"; assignmentId: string; targetStaffId?: string }) => {
+    mutationFn: async (payload: {
+      type: "swap" | "drop";
+      assignmentId: string;
+      targetStaffId?: string;
+    }) => {
       const response = await apiClient.post<{ swapRequest: SwapRequestDTO }>("/api/swaps", payload);
       return response.data.swapRequest;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["swaps"] }),
     onError: (error) => {
-      toast({ variant: "destructive", title: "Couldn't submit request", description: extractErrorMessage(error) });
+      toast({
+        variant: "destructive",
+        title: "Couldn't submit request",
+        description: extractErrorMessage(error),
+      });
     },
   });
 }

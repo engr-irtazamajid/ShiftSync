@@ -22,7 +22,9 @@ const revokeSchema = z.object({
 });
 
 export async function listCertifications(req: Request, res: Response): Promise<void> {
-  const certs = await CertificationModel.find({ staffId: req.params.staffId }).sort({ certifiedAt: -1 });
+  const certs = await CertificationModel.find({ staffId: req.params.staffId }).sort({
+    certifiedAt: -1,
+  });
   res.json({ certifications: certs.map(toCertificationDTO) });
 }
 
@@ -45,7 +47,8 @@ export async function revokeCertification(req: Request, res: Response): Promise<
     staffId: req.params.staffId,
   });
   if (!cert) throw new AppError(404, "CERTIFICATION_NOT_FOUND", "Certification not found");
-  if (cert.revokedAt) throw new AppError(409, "ALREADY_REVOKED", "Certification is already revoked");
+  if (cert.revokedAt)
+    throw new AppError(409, "ALREADY_REVOKED", "Certification is already revoked");
 
   assertLocationInManagerScope(req, cert.locationId.toString());
 

@@ -4,7 +4,10 @@ import { buildContext, makeAssignment, makeLocation, makeShift, makeUser } from 
 
 describe("checkDoubleBooking", () => {
   it("blocks an overlapping shift even across two different locations", () => {
-    const locationA = makeLocation({ name: "Location A", timezone: "America/Los_Angeles" } as never);
+    const locationA = makeLocation({
+      name: "Location A",
+      timezone: "America/Los_Angeles",
+    } as never);
     const locationB = makeLocation({ name: "Location B", timezone: "America/New_York" } as never);
     const staff = makeUser();
 

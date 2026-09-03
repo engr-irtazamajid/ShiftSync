@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import type { NotificationDTO } from "@shiftsync/shared";
-import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from "@/api/notifications";
+import {
+  useNotifications,
+  useMarkNotificationRead,
+  useMarkAllNotificationsRead,
+} from "@/api/notifications";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";

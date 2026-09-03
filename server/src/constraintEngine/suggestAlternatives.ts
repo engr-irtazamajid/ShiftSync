@@ -29,7 +29,12 @@ export async function suggestAlternatives(
     isActive: true,
   }).session(session ?? null);
 
-  const scored: Array<{ staffId: string; name: string; warningCount: number; weeklyHours: number }> = [];
+  const scored: Array<{
+    staffId: string;
+    name: string;
+    warningCount: number;
+    weeklyHours: number;
+  }> = [];
 
   for (const candidate of candidates) {
     const ctx = await loadEvaluationContext({
@@ -42,7 +47,11 @@ export async function suggestAlternatives(
 
     const weeklyHours = ctx.activeAssignments
       .filter((a) => a.shift.weekKey === ctx.shift.weekKey)
-      .reduce((sum, a) => sum + (a.shift.endUtc.getTime() - a.shift.startUtc.getTime()) / (1000 * 60 * 60), 0);
+      .reduce(
+        (sum, a) =>
+          sum + (a.shift.endUtc.getTime() - a.shift.startUtc.getTime()) / (1000 * 60 * 60),
+        0
+      );
 
     scored.push({
       staffId: candidate.id.toString(),

@@ -11,7 +11,6 @@ import {
 import { evaluateAssignment } from "../../constraintEngine";
 import { AssignmentModel, AssignmentDocument } from "../../models/Assignment";
 import { ShiftModel, ShiftDocument } from "../../models/Shift";
-import { LocationModel } from "../../models/Location";
 import { UserModel } from "../../models/User";
 import { AppError } from "../../middleware/AppError";
 import { writeAuditLog } from "../audit/service";
@@ -63,11 +62,22 @@ export async function assignStaff(input: AssignStaffInput): Promise<AssignStaffR
           shiftId: input.shiftId,
           currentShift: await currentShiftSnapshot(input.shiftId),
         });
-        throw new AppError(409, "SHIFT_VERSION_CONFLICT", "Shift has been modified; refresh and retry");
+        throw new AppError(
+          409,
+          "SHIFT_VERSION_CONFLICT",
+          "Shift has been modified; refresh and retry"
+        );
       }
 
-      if (!input.isAdmin && !input.managerLocationIds.includes(candidateShift.locationId.toString())) {
-        throw new AppError(403, "OUT_OF_SCOPE", "This shift's location is outside your managed scope");
+      if (
+        !input.isAdmin &&
+        !input.managerLocationIds.includes(candidateShift.locationId.toString())
+      ) {
+        throw new AppError(
+          403,
+          "OUT_OF_SCOPE",
+          "This shift's location is outside your managed scope"
+        );
       }
 
       const activeCount = await AssignmentModel.countDocuments({
@@ -122,7 +132,11 @@ export async function assignStaff(input: AssignStaffInput): Promise<AssignStaffR
           shiftId: input.shiftId,
           currentShift: await currentShiftSnapshot(input.shiftId),
         });
-        throw new AppError(409, "SHIFT_VERSION_CONFLICT", "Shift has been modified; refresh and retry");
+        throw new AppError(
+          409,
+          "SHIFT_VERSION_CONFLICT",
+          "Shift has been modified; refresh and retry"
+        );
       }
 
       await writeAuditLog({
@@ -142,9 +156,14 @@ export async function assignStaff(input: AssignStaffInput): Promise<AssignStaffR
     });
   } catch (err) {
     if (err instanceof ConstraintFailure) {
-      throw new AppError(422, "CONSTRAINT_VIOLATION", "Assignment violates one or more scheduling constraints", {
-        result: err.result as unknown as Record<string, unknown>,
-      });
+      throw new AppError(
+        422,
+        "CONSTRAINT_VIOLATION",
+        "Assignment violates one or more scheduling constraints",
+        {
+          result: err.result as unknown as Record<string, unknown>,
+        }
+      );
     }
     throw err;
   } finally {
@@ -175,11 +194,15 @@ export async function assignStaff(input: AssignStaffInput): Promise<AssignStaffR
   return { assignment: finalAssignment, shift: finalShift };
 }
 
-async function notifyManagersIfPushedIntoOvertime(staffId: string, shift: ShiftDocument): Promise<void> {
+async function notifyManagersIfPushedIntoOvertime(
+  staffId: string,
+  shift: ShiftDocument
+): Promise<void> {
   const existingHours = await weeklyHoursForStaff(staffId, shift.weekKey, shift.id.toString());
   const shiftHours = (shift.endUtc.getTime() - shift.startUtc.getTime()) / (1000 * 60 * 60);
   const projectedWeeklyHours = existingHours + shiftHours;
-  const pushesIntoOvertime = projectedWeeklyHours > OT_WEEKLY_THRESHOLD_HOURS && existingHours <= OT_WEEKLY_THRESHOLD_HOURS;
+  const pushesIntoOvertime =
+    projectedWeeklyHours > OT_WEEKLY_THRESHOLD_HOURS && existingHours <= OT_WEEKLY_THRESHOLD_HOURS;
   if (!pushesIntoOvertime) return;
 
   const staff = await UserModel.findById(staffId);
@@ -233,7 +256,11 @@ export async function unassignStaff(
       if (!shift) throw new AppError(404, "SHIFT_NOT_FOUND", "Shift not found");
 
       if (!isAdmin && !managerLocationIds.includes(shift.locationId.toString())) {
-        throw new AppError(403, "OUT_OF_SCOPE", "This shift's location is outside your managed scope");
+        throw new AppError(
+          403,
+          "OUT_OF_SCOPE",
+          "This shift's location is outside your managed scope"
+        );
       }
 
       const before = assignment.toObject();
@@ -304,7 +331,9 @@ export async function previewAssignment(
     projectedWeeklyHours,
     projectedWeeklyOvertimeHours: projectedOtHours,
     projectedWeeklyOvertimeCost,
-    pushesIntoOvertime: projectedWeeklyHours > OT_WEEKLY_THRESHOLD_HOURS && existingHours <= OT_WEEKLY_THRESHOLD_HOURS,
+    pushesIntoOvertime:
+      projectedWeeklyHours > OT_WEEKLY_THRESHOLD_HOURS &&
+      existingHours <= OT_WEEKLY_THRESHOLD_HOURS,
   };
 }
 
@@ -328,7 +357,11 @@ export async function listAssignments(filter: {
   return AssignmentModel.find(query).sort({ assignedAt: -1 });
 }
 
-async function weeklyHoursForStaff(staffId: string, weekKey: string, excludeShiftId?: string): Promise<number> {
+async function weeklyHoursForStaff(
+  staffId: string,
+  weekKey: string,
+  excludeShiftId?: string
+): Promise<number> {
   const assignments = await AssignmentModel.find({ staffId, status: AssignmentStatus.Active });
   const shiftIds = assignments
     .map((a) => a.shiftId)

@@ -18,7 +18,11 @@ export function useAuthBootstrap() {
     let cancelled = false;
 
     axios
-      .post<LoginResponse>(`${import.meta.env.VITE_API_URL}/api/auth/refresh`, {}, { withCredentials: true })
+      .post<LoginResponse>(
+        `${import.meta.env.VITE_API_URL}/api/auth/refresh`,
+        {},
+        { withCredentials: true }
+      )
       .then((response) => {
         if (!cancelled) {
           setSession(response.data.user, response.data.accessToken);

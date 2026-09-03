@@ -18,10 +18,7 @@ export function fromLocationLocal(
   minute: number,
   ianaTz: string
 ): Date {
-  const dt = DateTime.fromObject(
-    { year, month, day, hour, minute },
-    { zone: ianaTz }
-  );
+  const dt = DateTime.fromObject({ year, month, day, hour, minute }, { zone: ianaTz });
   if (!dt.isValid) {
     throw new Error(`Invalid local time in zone ${ianaTz}: ${dt.invalidReason}`);
   }
@@ -77,16 +74,15 @@ export function diffInHours(startUtc: Date, endUtc: Date): number {
   return (endUtc.getTime() - startUtc.getTime()) / (1000 * 60 * 60);
 }
 
-export function rangesOverlap(
-  aStart: Date,
-  aEnd: Date,
-  bStart: Date,
-  bEnd: Date
-): boolean {
+export function rangesOverlap(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): boolean {
   return aStart.getTime() < bEnd.getTime() && bStart.getTime() < aEnd.getTime();
 }
 
-function isNonexistentLocalTime(dt: DateTime, requestedHour: number, requestedMinute: number): boolean {
+function isNonexistentLocalTime(
+  dt: DateTime,
+  requestedHour: number,
+  requestedMinute: number
+): boolean {
   return !dt.isValid || dt.hour !== requestedHour || dt.minute !== requestedMinute;
 }
 

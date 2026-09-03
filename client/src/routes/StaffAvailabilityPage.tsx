@@ -1,11 +1,22 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { AvailabilityType } from "@shiftsync/shared";
-import { useUser, useUserAvailability, useReplaceAvailability, useAddAvailabilityException } from "@/api/users";
+import {
+  useUser,
+  useUserAvailability,
+  useReplaceAvailability,
+  useAddAvailabilityException,
+} from "@/api/users";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -25,7 +36,11 @@ export function StaffAvailabilityPage() {
   const recurring = availability.filter((a) => a.type === AvailabilityType.Recurring);
   const exceptions = availability.filter((a) => a.type === AvailabilityType.Exception);
 
-  const [draft, setDraft] = useState<RecurringDraft>({ dayOfWeek: 1, startLocalTime: "09:00", endLocalTime: "17:00" });
+  const [draft, setDraft] = useState<RecurringDraft>({
+    dayOfWeek: 1,
+    startLocalTime: "09:00",
+    endLocalTime: "17:00",
+  });
   const [exceptionDate, setExceptionDate] = useState("");
   const [exceptionUnavailable, setExceptionUnavailable] = useState(true);
 
@@ -58,7 +73,8 @@ export function StaffAvailabilityPage() {
         {user ? `${user.firstName} ${user.lastName}'s availability` : "Availability"}
       </h1>
       <p className="text-sm text-muted-foreground">
-        Recurring windows are wall-clock times interpreted against each shift's own location timezone.
+        Recurring windows are wall-clock times interpreted against each shift's own location
+        timezone.
       </p>
 
       <Card>
@@ -134,7 +150,11 @@ export function StaffAvailabilityPage() {
           <div className="flex items-end gap-2 border-t pt-3">
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">Date</label>
-              <Input type="date" value={exceptionDate} onChange={(e) => setExceptionDate(e.target.value)} />
+              <Input
+                type="date"
+                value={exceptionDate}
+                onChange={(e) => setExceptionDate(e.target.value)}
+              />
             </div>
             <Select
               value={exceptionUnavailable ? "unavailable" : "available"}

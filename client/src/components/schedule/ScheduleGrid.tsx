@@ -49,7 +49,9 @@ export function ScheduleGrid({ shifts, location, skills, canManage, isAdmin }: S
   const shiftsByDay = useMemo(() => {
     const buckets: ShiftDTO[][] = Array.from({ length: 7 }, () => []);
     for (const shift of shifts) {
-      const dayIndex = new Date(toLocalDateString(shift.startUtc, timezone) + "T00:00:00Z").getUTCDay();
+      const dayIndex = new Date(
+        toLocalDateString(shift.startUtc, timezone) + "T00:00:00Z"
+      ).getUTCDay();
       buckets[dayIndex].push(shift);
     }
     return buckets;

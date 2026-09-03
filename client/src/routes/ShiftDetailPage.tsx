@@ -30,7 +30,8 @@ export function ShiftDetailPage() {
           {skill?.name ?? "Shift"} at {location?.name ?? "—"}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {formatInZone(shift.startUtc, timezone)} – {formatInZone(shift.endUtc, timezone, "h:mm a")}
+          {formatInZone(shift.startUtc, timezone)} –{" "}
+          {formatInZone(shift.endUtc, timezone, "h:mm a")}
         </p>
       </div>
 

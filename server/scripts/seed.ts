@@ -52,10 +52,22 @@ async function wipe(): Promise<void> {
 
 async function seedLocations() {
   return LocationModel.create([
-    { name: "Downtown LA", timezone: "America/Los_Angeles", address: "123 Spring St, Los Angeles, CA" },
-    { name: "Santa Monica", timezone: "America/Los_Angeles", address: "456 Ocean Ave, Santa Monica, CA" },
+    {
+      name: "Downtown LA",
+      timezone: "America/Los_Angeles",
+      address: "123 Spring St, Los Angeles, CA",
+    },
+    {
+      name: "Santa Monica",
+      timezone: "America/Los_Angeles",
+      address: "456 Ocean Ave, Santa Monica, CA",
+    },
     { name: "Midtown NYC", timezone: "America/New_York", address: "789 5th Ave, New York, NY" },
-    { name: "Brooklyn Heights", timezone: "America/New_York", address: "321 Montague St, Brooklyn, NY" },
+    {
+      name: "Brooklyn Heights",
+      timezone: "America/New_York",
+      address: "321 Montague St, Brooklyn, NY",
+    },
   ]);
 }
 
@@ -111,7 +123,11 @@ async function main(): Promise<void> {
     managedLocationIds: [midtownNYC._id, brooklynHeights._id],
     skillIds: [],
   });
-  credentials.push({ email: managerNYC.email, role: "manager", note: "Manages both NYC locations" });
+  credentials.push({
+    email: managerNYC.email,
+    role: "manager",
+    note: "Manages both NYC locations",
+  });
 
   const managerMixed = await UserModel.create({
     email: "manager.mixed@coastaleats.com",
@@ -135,23 +151,119 @@ async function main(): Promise<void> {
     desiredWeeklyHours: number | null;
     locations: mongoose.Types.ObjectId[];
   }> = [
-    { firstName: "Sarah", lastName: "Chen", skills: [bartender._id, server._id], desiredWeeklyHours: 32, locations: [downtownLA._id] },
-    { firstName: "John", lastName: "Diaz", skills: [bartender._id], desiredWeeklyHours: 30, locations: [downtownLA._id] },
-    { firstName: "Maria", lastName: "Lopez", skills: [bartender._id, host._id], desiredWeeklyHours: 25, locations: [downtownLA._id, santaMonica._id] },
-    { firstName: "Chris", lastName: "Evans", skills: [lineCook._id], desiredWeeklyHours: 38, locations: [downtownLA._id] },
-    { firstName: "Priya", lastName: "Shah", skills: [lineCook._id, dishwasher._id], desiredWeeklyHours: 35, locations: [santaMonica._id] },
-    { firstName: "Marcus", lastName: "Johnson", skills: [server._id, host._id], desiredWeeklyHours: 20, locations: [santaMonica._id] },
-    { firstName: "Emily", lastName: "White", skills: [server._id], desiredWeeklyHours: 28, locations: [santaMonica._id] },
-    { firstName: "David", lastName: "Kim", skills: [barback._id, dishwasher._id], desiredWeeklyHours: 25, locations: [downtownLA._id, santaMonica._id] },
-    { firstName: "Olivia", lastName: "Brown", skills: [bartender._id, server._id], desiredWeeklyHours: 30, locations: [midtownNYC._id] },
-    { firstName: "Ethan", lastName: "Wright", skills: [lineCook._id], desiredWeeklyHours: 40, locations: [midtownNYC._id] },
-    { firstName: "Sophia", lastName: "Martinez", skills: [server._id, host._id], desiredWeeklyHours: 22, locations: [midtownNYC._id] },
-    { firstName: "Liam", lastName: "Garcia", skills: [barback._id], desiredWeeklyHours: 18, locations: [midtownNYC._id, brooklynHeights._id] },
-    { firstName: "Ava", lastName: "Robinson", skills: [server._id], desiredWeeklyHours: 26, locations: [brooklynHeights._id] },
-    { firstName: "Noah", lastName: "Clark", skills: [lineCook._id, dishwasher._id], desiredWeeklyHours: 32, locations: [brooklynHeights._id] },
-    { firstName: "Isabella", lastName: "Lewis", skills: [bartender._id, host._id], desiredWeeklyHours: 24, locations: [brooklynHeights._id] },
+    {
+      firstName: "Sarah",
+      lastName: "Chen",
+      skills: [bartender._id, server._id],
+      desiredWeeklyHours: 32,
+      locations: [downtownLA._id],
+    },
+    {
+      firstName: "John",
+      lastName: "Diaz",
+      skills: [bartender._id],
+      desiredWeeklyHours: 30,
+      locations: [downtownLA._id],
+    },
+    {
+      firstName: "Maria",
+      lastName: "Lopez",
+      skills: [bartender._id, host._id],
+      desiredWeeklyHours: 25,
+      locations: [downtownLA._id, santaMonica._id],
+    },
+    {
+      firstName: "Chris",
+      lastName: "Evans",
+      skills: [lineCook._id],
+      desiredWeeklyHours: 38,
+      locations: [downtownLA._id],
+    },
+    {
+      firstName: "Priya",
+      lastName: "Shah",
+      skills: [lineCook._id, dishwasher._id],
+      desiredWeeklyHours: 35,
+      locations: [santaMonica._id],
+    },
+    {
+      firstName: "Marcus",
+      lastName: "Johnson",
+      skills: [server._id, host._id],
+      desiredWeeklyHours: 20,
+      locations: [santaMonica._id],
+    },
+    {
+      firstName: "Emily",
+      lastName: "White",
+      skills: [server._id],
+      desiredWeeklyHours: 28,
+      locations: [santaMonica._id],
+    },
+    {
+      firstName: "David",
+      lastName: "Kim",
+      skills: [barback._id, dishwasher._id],
+      desiredWeeklyHours: 25,
+      locations: [downtownLA._id, santaMonica._id],
+    },
+    {
+      firstName: "Olivia",
+      lastName: "Brown",
+      skills: [bartender._id, server._id],
+      desiredWeeklyHours: 30,
+      locations: [midtownNYC._id],
+    },
+    {
+      firstName: "Ethan",
+      lastName: "Wright",
+      skills: [lineCook._id],
+      desiredWeeklyHours: 40,
+      locations: [midtownNYC._id],
+    },
+    {
+      firstName: "Sophia",
+      lastName: "Martinez",
+      skills: [server._id, host._id],
+      desiredWeeklyHours: 22,
+      locations: [midtownNYC._id],
+    },
+    {
+      firstName: "Liam",
+      lastName: "Garcia",
+      skills: [barback._id],
+      desiredWeeklyHours: 18,
+      locations: [midtownNYC._id, brooklynHeights._id],
+    },
+    {
+      firstName: "Ava",
+      lastName: "Robinson",
+      skills: [server._id],
+      desiredWeeklyHours: 26,
+      locations: [brooklynHeights._id],
+    },
+    {
+      firstName: "Noah",
+      lastName: "Clark",
+      skills: [lineCook._id, dishwasher._id],
+      desiredWeeklyHours: 32,
+      locations: [brooklynHeights._id],
+    },
+    {
+      firstName: "Isabella",
+      lastName: "Lewis",
+      skills: [bartender._id, host._id],
+      desiredWeeklyHours: 24,
+      locations: [brooklynHeights._id],
+    },
     // certified at both an LA and NYC location — exercises the per-location availability decision
-    { firstName: "Grace", lastName: "Walker", skills: [server._id, bartender._id], desiredWeeklyHours: 20, locations: [santaMonica._id, midtownNYC._id] },
+    {
+      firstName: "Grace",
+      lastName: "Walker",
+      skills: [server._id, bartender._id],
+      desiredWeeklyHours: 20,
+      locations: [santaMonica._id, midtownNYC._id],
+    },
   ];
 
   const staff: SeededUser[] = [];
@@ -214,14 +326,24 @@ async function main(): Promise<void> {
     ]);
   }
 
-  credentials.push({ email: staff[0].email, role: "staff", note: "Bartender at Downtown LA, near weekly OT threshold this week" });
+  credentials.push({
+    email: staff[0].email,
+    role: "staff",
+    note: "Bartender at Downtown LA, near weekly OT threshold this week",
+  });
   credentials.push({
     email: "grace.walker@coastaleats.com",
     role: "staff",
     note: "Certified at Santa Monica (PT) and Midtown NYC (ET) — exercises cross-timezone availability",
   });
 
-  for (const person of [admin, managerLA, managerNYC, managerMixed, ...staff.map((s) => ({ _id: s.id, email: s.email }))]) {
+  for (const person of [
+    admin,
+    managerLA,
+    managerNYC,
+    managerMixed,
+    ...staff.map((s) => ({ _id: s.id, email: s.email })),
+  ]) {
     await NotificationPreferenceModel.create({
       userId: person._id,
       emailSimEnabled: Math.random() > 0.6,
@@ -339,7 +461,13 @@ async function main(): Promise<void> {
   // Timezone-aware equivalent of laDay: computes "this week's Monday" fresh in the
   // given zone (rather than converting a Pacific-anchored Monday), so it's correct
   // even when the two zones' local calendar dates diverge near a day boundary.
-  function weekDay(timezone: string, dayOfWeek: number, hour: number, minute = 0, weekOffset = 0): Date {
+  function weekDay(
+    timezone: string,
+    dayOfWeek: number,
+    hour: number,
+    minute = 0,
+    weekOffset = 0
+  ): Date {
     const zoneNow = DateTime.now().setZone(timezone);
     const zoneMonday = zoneNow.set({ weekday: 1, hour: 0, minute: 0, second: 0, millisecond: 0 });
     const mondayOffset = dayOfWeek === 0 ? -1 : dayOfWeek - 1;
@@ -470,7 +598,12 @@ async function main(): Promise<void> {
     status: ShiftStatus.Published,
     createdBy: managerLA._id,
   });
-  const davidAssignment = await assignDirect(soonShift._id, david.id, managerLA._id, santaMonica._id);
+  const davidAssignment = await assignDirect(
+    soonShift._id,
+    david.id,
+    managerLA._id,
+    santaMonica._id
+  );
   await SwapRequestModel.create({
     type: SwapType.Drop,
     assignmentId: davidAssignment._id,
@@ -511,7 +644,10 @@ async function main(): Promise<void> {
   });
 
   // Revoked-then-recertified staff/location pair (ambiguity #1 demo)
-  const oldCert = await CertificationModel.findOne({ staffId: david.id, locationId: downtownLA._id });
+  const oldCert = await CertificationModel.findOne({
+    staffId: david.id,
+    locationId: downtownLA._id,
+  });
   if (oldCert) {
     const before = oldCert.toObject();
     oldCert.revokedAt = DateTime.now().minus({ months: 2 }).toJSDate();

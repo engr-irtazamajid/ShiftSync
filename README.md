@@ -4,8 +4,8 @@ Multi-location staff scheduling platform for Coastal Eats, a 4-location restaura
 
 ## Live app
 
-- App: _TBD (URL)_
-- API: _TBD (URL)_
+- App: https://shiftsync-client.onrender.com
+- API: https://shiftsync-api-z3kx.onrender.com
 
 ## Stack
 
@@ -38,17 +38,84 @@ To deploy: push this repo to GitHub, create a Render Blueprint from it, and set 
 
 ## Demo accounts
 
-All seeded accounts use the password `Password123!` unless noted otherwise.
+Every seeded account uses the password **`Password123!`**.
 
-| Role | Email | Notes |
+**Admin**
+
+| Email | Name | Notes |
 | --- | --- | --- |
-| Admin | admin@coastaleats.com | Full cross-location visibility |
-| Manager | manager.la@coastaleats.com | Manages both LA locations |
-| Manager | manager.nyc@coastaleats.com | Manages both NYC locations |
-| Manager | manager.mixed@coastaleats.com | Manages one LA + one NYC location |
-| Staff | (see seed output) | Varied skills, certifications, availability |
+| admin@coastaleats.com | Alex Rivera | Full cross-location visibility |
+
+**Managers**
+
+| Email | Name | Manages |
+| --- | --- | --- |
+| manager.la@coastaleats.com | Jordan Kim | Downtown LA + Santa Monica |
+| manager.nyc@coastaleats.com | Taylor Nguyen | Midtown NYC + Brooklyn Heights |
+| manager.mixed@coastaleats.com | Sam Patel | Santa Monica (Pacific) + Midtown NYC (Eastern) — cross-timezone scope |
+
+**Staff** (skills · desired weekly hours · certified location(s))
+
+| Email | Name | Skills | Desired hrs | Certified at |
+| --- | --- | --- | --- | --- |
+| sarah.chen@coastaleats.com | Sarah Chen | bartender, server | 32 | Downtown LA |
+| john.diaz@coastaleats.com | John Diaz | bartender | 30 | Downtown LA |
+| maria.lopez@coastaleats.com | Maria Lopez | bartender, host | 25 | Downtown LA, Santa Monica |
+| chris.evans@coastaleats.com | Chris Evans | line_cook | 38 | Downtown LA |
+| priya.shah@coastaleats.com | Priya Shah | line_cook, dishwasher | 35 | Santa Monica |
+| marcus.johnson@coastaleats.com | Marcus Johnson | server, host | 20 | Santa Monica |
+| emily.white@coastaleats.com | Emily White | server | 28 | Santa Monica |
+| david.kim@coastaleats.com | David Kim | barback, dishwasher | 25 | Downtown LA (re-certified), Santa Monica |
+| olivia.brown@coastaleats.com | Olivia Brown | bartender, server | 30 | Midtown NYC |
+| ethan.wright@coastaleats.com | Ethan Wright | line_cook | 40 | Midtown NYC |
+| sophia.martinez@coastaleats.com | Sophia Martinez | server, host | 22 | Midtown NYC |
+| liam.garcia@coastaleats.com | Liam Garcia | barback | 18 | Midtown NYC, Brooklyn Heights |
+| ava.robinson@coastaleats.com | Ava Robinson | server | 26 | Brooklyn Heights |
+| noah.clark@coastaleats.com | Noah Clark | line_cook, dishwasher | 32 | Brooklyn Heights |
+| isabella.lewis@coastaleats.com | Isabella Lewis | bartender, host | 24 | Brooklyn Heights |
+| grace.walker@coastaleats.com | Grace Walker | server, bartender | 20 | Santa Monica (Pacific) + Midtown NYC (Eastern) — cross-timezone availability |
+
+All staff share the same recurring availability pattern: **Mon & Wed 9:00 AM–5:00 PM, Fri & Sat 4:00 PM–midnight**, all in their certified location's own local time.
 
 Run `npm run seed --workspace=server` to (re)populate a fresh database and print the full credential list to stdout.
+
+## Testing the evaluation scenarios
+
+All scenarios below assume the app is freshly seeded (dates are relative to "this week" at seed time). Locations: **Downtown LA** and **Santa Monica** are Pacific time; **Midtown NYC** and **Brooklyn Heights** are Eastern time.
+
+### 1. The Sunday Night Chaos (fast coverage path)
+1. Log in as a staff member with an active shift (e.g. `david.kim@coastaleats.com` has a Santa Monica dishwasher shift with a pending drop request already seeded, expiring ~2h after seed time).
+2. Log in as `priya.shah@coastaleats.com` (the only staff qualified for that shift — dishwasher skill + Santa Monica certification + matching availability) → **Swaps → Available drops** → **Claim**.
+3. Log in as `manager.la@coastaleats.com` → **Swaps → Needs approval** → **Approve**. The shift is now reassigned to Priya, and both parties are notified in real time.
+
+### 2. The Overtime Trap
+1. Log in as `manager.la@coastaleats.com` → **Overtime dashboard**. Sarah Chen should already show ~44 hours this week (past the 40h threshold), flagged with a projected overtime cost.
+2. Go to **Schedule → Downtown LA**, open any shift, and try assigning Sarah to it in the Assignment dialog — the **live "what-if" preview** shows her projected weekly hours and overtime cost impact *before* you confirm, without needing to actually assign her first.
+
+### 3. The Timezone Tangle
+1. Log in as `manager.mixed@coastaleats.com` (manages Santa Monica + Midtown NYC).
+2. Try assigning **Grace Walker** to a shift at Santa Monica around 9am–5pm Pacific — passes cleanly.
+3. Try assigning her to a shift at Midtown NYC around 9am–5pm Eastern — also passes cleanly, because her availability is matched against each shift's own location timezone independently, not translated from one zone to the other. (If the system used the opposite interpretation, the NYC shift would need to be ~12pm–8pm Eastern to match her Pacific "9am–5pm" — it doesn't need to be.)
+
+### 4. The Simultaneous Assignment
+1. Open the same **unstaffed** shift's Assignment dialog in two browser tabs, logged in as the same or two different managers of that location.
+2. In both tabs, select a candidate and click **Confirm assignment** within a couple of seconds of each other.
+3. One request succeeds; the other receives an immediate `409` conflict — either because the shift's optimistic-lock version changed underneath it, or because the candidate is now double-booked across locations — with a real-time toast notification, not a silent failure or duplicate assignment.
+
+### 5. The Fairness Complaint
+1. Log in as `manager.la@coastaleats.com` or the admin → **Fairness** page.
+2. The premium (Friday/Saturday evening) shift distribution and equity score are already visibly uneven in the seed data — a manager can point to real, computed numbers (not opinions) to confirm or refute a "I never get Saturday nights" complaint.
+
+### 6. The Regret Swap
+1. Log in as `john.diaz@coastaleats.com` → **Swaps → My requests**. He has a pending swap offered to Maria Lopez (not yet accepted) — the **Withdraw** button is available here.
+2. Log in as `maria.lopez@coastaleats.com` → **Swaps → Incoming** → **Accept**. The request moves to "awaiting manager."
+3. Back as John → **Swaps → My requests** — the **Withdraw** button is now gone; only the manager (`manager.la@coastaleats.com` → **Swaps → Needs approval**) can still **Deny** it with a documented reason.
+
+### Additional things worth clicking through
+- **Publish/Unpublish**: Schedule page shows live "X published / Y draft" counts per week; buttons disable themselves when there's nothing to publish/unpublish.
+- **Notifications**: the bell icon and full Notifications page both navigate to the relevant shift or swap when clicked; toasts are color-coded (green success, amber warning, red error).
+- **Audit log** (admin only): filterable by location/date range, with CSV/JSON export — includes the seeded revoked-then-recertified staff record and the denied historical swap.
+- **On-duty now** panel on the Schedule page shows whoever's shift window currently covers "now," if any.
 
 ## Seeded edge cases
 
@@ -90,5 +157,9 @@ The seed script deliberately plants these scenarios for evaluation:
 - Overtime cost projections use a flat hourly base rate with a 1.5x multiplier beyond 40 hours/week as a simplifying assumption; real payroll rules (location-specific rates, shift differentials) are out of scope.
 - `react-router-dom` 6.x has an open npm-audit advisory (open-redirect via crafted `<Link>`/`useNavigate` targets). This app never renders a route target from untrusted user input, so the advisory does not apply to any code path here; noted rather than silently ignored.
 - The production client bundle is a single ~575KB (185KB gzipped) JS chunk; route-based code-splitting was not implemented given the assessment's time constraints.
-- Every backend module and its exact response shapes were verified through direct API integration testing (login, constraint evaluation, the full swap accept/approve lifecycle, concurrency conflicts, analytics) against a real MongoDB replica set. The frontend was verified to build cleanly and serve correctly, but full interactive browser QA (clicking through every dialog and flow) should still be done once before final submission.
+- Every backend module and its exact response shapes were verified through direct API integration testing (login, constraint evaluation, the full swap accept/approve lifecycle, concurrency conflicts, analytics) against a real MongoDB replica set, and the deployed app was manually clicked through end-to-end on the live Render URL (login, schedule creation and assignment, swap/drop request and approval flows, notifications) before submission.
 - There is no admin UI screen for creating new users (managers/staff) or certifying staff at a location — those operations are fully implemented and enforced server-side (`POST /users`, `POST /users/:id/certifications`, both role-scoped) and are exercised by the seed script, but onboarding a new hire currently requires a direct API call rather than a form. The assessment's scope centers on scheduling, constraint enforcement, swaps, and real-time behavior rather than admin CRUD tooling, so this was deliberately left out of the UI to focus effort on the higher-weighted areas.
+
+
+##Project UI SS
+![alt text](image.png)

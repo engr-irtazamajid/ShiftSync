@@ -90,7 +90,9 @@ export function useSocketEvents() {
     };
 
     socket.on(SocketEvent.SchedulePublished, (p: SchedulePublishedPayload) => invalidateShifts(p));
-    socket.on(SocketEvent.ScheduleUnpublished, (p: ScheduleUnpublishedPayload) => invalidateShifts(p));
+    socket.on(SocketEvent.ScheduleUnpublished, (p: ScheduleUnpublishedPayload) =>
+      invalidateShifts(p)
+    );
     socket.on(SocketEvent.ShiftUpdated, onShiftUpdated);
     socket.on(SocketEvent.AssignmentCreated, onShiftUpdated);
     socket.on(SocketEvent.AssignmentRemoved, onShiftUpdated);

@@ -36,7 +36,4 @@ const notificationSchema = new Schema<NotificationShape>(
 
 notificationSchema.index({ userId: 1, readAt: 1, createdAt: -1 });
 
-export const NotificationModel = model<NotificationShape>(
-  "Notification",
-  notificationSchema
-);
+export const NotificationModel = model<NotificationShape>("Notification", notificationSchema);

@@ -35,7 +35,4 @@ const availabilitySchema = new Schema<AvailabilityShape>(
 availabilitySchema.index({ staffId: 1, type: 1 });
 availabilitySchema.index({ staffId: 1, exceptionDate: 1 });
 
-export const AvailabilityModel = model<AvailabilityShape>(
-  "Availability",
-  availabilitySchema
-);
+export const AvailabilityModel = model<AvailabilityShape>("Availability", availabilitySchema);

@@ -32,7 +32,9 @@ export async function loginHandler(req: Request, res: Response): Promise<void> {
 export async function refreshHandler(req: Request, res: Response): Promise<void> {
   const token = req.cookies?.[REFRESH_COOKIE_NAME];
   if (!token) {
-    res.status(401).json({ error: { code: "MISSING_REFRESH_TOKEN", message: "No refresh token cookie present" } });
+    res.status(401).json({
+      error: { code: "MISSING_REFRESH_TOKEN", message: "No refresh token cookie present" },
+    });
     return;
   }
 

@@ -42,7 +42,8 @@ export async function otDashboard(req: Request, res: Response): Promise<void> {
 
 export async function onDutyNow(req: Request, res: Response): Promise<void> {
   const locationId = req.query.locationId as string | undefined;
-  if (!locationId) throw new AppError(400, "MISSING_LOCATION_ID", "locationId query parameter is required");
+  if (!locationId)
+    throw new AppError(400, "MISSING_LOCATION_ID", "locationId query parameter is required");
   const entries = await analyticsService.onDutyNow(locationId);
   res.json({ entries });
 }

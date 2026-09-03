@@ -19,7 +19,11 @@ import { env } from "../../config/env";
 import { writeAuditLog } from "../audit/service";
 import { createNotification, emitCreatedNotification } from "../notifications/service";
 import { NotificationDocument } from "../../models/Notification";
-import { emitSchedulePublished, emitScheduleUnpublished, emitShiftUpdated } from "../../sockets/emitters";
+import {
+  emitSchedulePublished,
+  emitScheduleUnpublished,
+  emitShiftUpdated,
+} from "../../sockets/emitters";
 import { resolveNotify } from "../swaps/service";
 import { toShiftDTO } from "./mapper";
 
@@ -145,7 +149,7 @@ export async function updateShift(
 ): Promise<ShiftDocument> {
   const session = await mongoose.startSession();
   let updated: ShiftDocument | null = null;
-  let cancelledSwaps: SwapRequestDocument[] = [];
+  const cancelledSwaps: SwapRequestDocument[] = [];
   let createdNotifications: (NotificationDocument | null)[] = [];
   let affectedStaffIds: string[] = [];
 
@@ -260,7 +264,7 @@ export async function cancelShift(
 ): Promise<ShiftDocument> {
   const session = await mongoose.startSession();
   let cancelled: ShiftDocument | null = null;
-  let cancelledSwaps: SwapRequestDocument[] = [];
+  const cancelledSwaps: SwapRequestDocument[] = [];
   let createdNotifications: (NotificationDocument | null)[] = [];
 
   try {
@@ -355,7 +359,10 @@ export async function cancelShift(
   return finalShift;
 }
 
-async function affectedStaffIdsForShifts(shiftIds: Types.ObjectId[], session: mongoose.ClientSession): Promise<string[]> {
+async function affectedStaffIdsForShifts(
+  shiftIds: Types.ObjectId[],
+  session: mongoose.ClientSession
+): Promise<string[]> {
   const assignments = await AssignmentModel.find({
     shiftId: { $in: shiftIds },
     status: AssignmentStatus.Active,
@@ -376,7 +383,11 @@ export async function publishShifts(
 
   try {
     await session.withTransaction(async () => {
-      const shifts = await ShiftModel.find({ locationId, weekKey, status: ShiftStatus.Draft }).session(session);
+      const shifts = await ShiftModel.find({
+        locationId,
+        weekKey,
+        status: ShiftStatus.Draft,
+      }).session(session);
       shiftIds = shifts.map((s) => s._id);
 
       if (shiftIds.length > 0) {
@@ -435,7 +446,11 @@ export async function unpublishShifts(
 
   try {
     await session.withTransaction(async () => {
-      const shifts = await ShiftModel.find({ locationId, weekKey, status: ShiftStatus.Published }).session(session);
+      const shifts = await ShiftModel.find({
+        locationId,
+        weekKey,
+        status: ShiftStatus.Published,
+      }).session(session);
       shiftIds = shifts.map((s) => s._id);
 
       if (shiftIds.length > 0) {

@@ -23,7 +23,9 @@ export function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>ShiftSync</CardTitle>
-          <CardDescription>Sign in to manage schedules across Coastal Eats locations.</CardDescription>
+          <CardDescription>
+            Sign in to manage schedules across Coastal Eats locations.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

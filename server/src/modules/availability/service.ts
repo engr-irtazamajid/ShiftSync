@@ -7,7 +7,9 @@ export async function notifyManagersOfAvailabilityChange(staffId: string): Promi
   const staff = await UserModel.findById(staffId);
   if (!staff) return;
 
-  const certifications = await CertificationModel.find({ staffId, revokedAt: null }).distinct("locationId");
+  const certifications = await CertificationModel.find({ staffId, revokedAt: null }).distinct(
+    "locationId"
+  );
   if (certifications.length === 0) return;
 
   const recipients = await UserModel.find({

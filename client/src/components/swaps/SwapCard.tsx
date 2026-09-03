@@ -30,7 +30,11 @@ export interface SwapCardDetails {
 interface SwapCardProps {
   swap: SwapRequestDTO;
   details?: SwapCardDetails;
-  actions?: Array<{ label: string; variant?: "default" | "outline" | "destructive"; onClick: () => void }>;
+  actions?: Array<{
+    label: string;
+    variant?: "default" | "outline" | "destructive";
+    onClick: () => void;
+  }>;
 }
 
 function describeParties(swap: SwapRequestDTO, details?: SwapCardDetails): string {
@@ -82,7 +86,9 @@ export function SwapCard({ swap, details, actions = [] }: SwapCardProps) {
             Requested {new Date(swap.createdAt).toLocaleString()}
           </p>
           {swap.managerDecisionReason && (
-            <p className="mt-1 text-xs text-muted-foreground">Reason: {swap.managerDecisionReason}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Reason: {swap.managerDecisionReason}
+            </p>
           )}
           {swap.autoCancelledReason && (
             <p className="mt-1 text-xs text-destructive">Cancelled: {swap.autoCancelledReason}</p>
@@ -91,7 +97,12 @@ export function SwapCard({ swap, details, actions = [] }: SwapCardProps) {
         {actions.length > 0 && (
           <div className="flex shrink-0 gap-2">
             {actions.map((action) => (
-              <Button key={action.label} size="sm" variant={action.variant ?? "default"} onClick={action.onClick}>
+              <Button
+                key={action.label}
+                size="sm"
+                variant={action.variant ?? "default"}
+                onClick={action.onClick}
+              >
                 {action.label}
               </Button>
             ))}

@@ -39,7 +39,11 @@ export async function createSwapRequest(input: CreateSwapInput): Promise<SwapReq
     throw new AppError(409, "ASSIGNMENT_NOT_ACTIVE", "Assignment is not active");
   }
   if (assignment.staffId.toString() !== input.requestedBy) {
-    throw new AppError(403, "NOT_ASSIGNMENT_OWNER", "You may only request a swap on your own assignment");
+    throw new AppError(
+      403,
+      "NOT_ASSIGNMENT_OWNER",
+      "You may only request a swap on your own assignment"
+    );
   }
 
   const pendingCount = await SwapRequestModel.countDocuments({
@@ -47,11 +51,19 @@ export async function createSwapRequest(input: CreateSwapInput): Promise<SwapReq
     status: { $in: OPEN_SWAP_STATUSES },
   });
   if (pendingCount >= MAX_PENDING_PER_STAFF) {
-    throw new AppError(409, "MAX_PENDING_SWAPS", "You already have the maximum number of pending swap/drop requests");
+    throw new AppError(
+      409,
+      "MAX_PENDING_SWAPS",
+      "You already have the maximum number of pending swap/drop requests"
+    );
   }
 
   if (input.type === SwapType.Swap && !input.targetStaffId) {
-    throw new AppError(400, "TARGET_STAFF_REQUIRED", "targetStaffId is required for a swap request");
+    throw new AppError(
+      400,
+      "TARGET_STAFF_REQUIRED",
+      "targetStaffId is required for a swap request"
+    );
   }
 
   const shift = await ShiftModel.findById(assignment.shiftId);
@@ -68,7 +80,8 @@ export async function createSwapRequest(input: CreateSwapInput): Promise<SwapReq
     requestedBy: input.requestedBy,
     targetStaffId: input.type === SwapType.Swap ? input.targetStaffId : null,
     claimedBy: null,
-    status: input.type === SwapType.Swap ? SwapStatus.PendingTargetAcceptance : SwapStatus.PendingClaim,
+    status:
+      input.type === SwapType.Swap ? SwapStatus.PendingTargetAcceptance : SwapStatus.PendingClaim,
     expiresAt,
   });
 
@@ -101,8 +114,13 @@ export async function createSwapRequest(input: CreateSwapInput): Promise<SwapReq
   return swap;
 }
 
-async function notifyEligibleClaimants(swap: SwapRequestDocument, locationId: string): Promise<void> {
-  const certifiedStaffIds = await CertificationModel.find({ locationId, revokedAt: null }).distinct("staffId");
+async function notifyEligibleClaimants(
+  swap: SwapRequestDocument,
+  locationId: string
+): Promise<void> {
+  const certifiedStaffIds = await CertificationModel.find({ locationId, revokedAt: null }).distinct(
+    "staffId"
+  );
   for (const staffId of certifiedStaffIds) {
     if (staffId.toString() === swap.requestedBy.toString()) continue;
     await createNotification({
@@ -122,9 +140,13 @@ async function loadOpenSwap(swapId: string): Promise<SwapRequestDocument> {
   return swap;
 }
 
-export async function acceptSwap(swapId: string, actingUserId: string): Promise<SwapRequestDocument> {
+export async function acceptSwap(
+  swapId: string,
+  actingUserId: string
+): Promise<SwapRequestDocument> {
   const swap = await loadOpenSwap(swapId);
-  if (swap.type !== SwapType.Swap) throw new AppError(400, "NOT_A_SWAP", "Only swap requests can be accepted");
+  if (swap.type !== SwapType.Swap)
+    throw new AppError(400, "NOT_A_SWAP", "Only swap requests can be accepted");
   if (swap.status !== SwapStatus.PendingTargetAcceptance) {
     throw new AppError(409, "INVALID_STATE", "Swap request is not awaiting target acceptance");
   }
@@ -137,14 +159,23 @@ export async function acceptSwap(swapId: string, actingUserId: string): Promise<
   await swap.save();
   await auditSwap(swap, before, AuditAction.Update, actingUserId);
 
-  await notifyManagersForSwap(swap, NotificationType.ApprovalNeeded, "Swap awaiting approval", "A swap request has been accepted and now needs manager approval.");
+  await notifyManagersForSwap(
+    swap,
+    NotificationType.ApprovalNeeded,
+    "Swap awaiting approval",
+    "A swap request has been accepted and now needs manager approval."
+  );
 
   return swap;
 }
 
-export async function rejectSwap(swapId: string, actingUserId: string): Promise<SwapRequestDocument> {
+export async function rejectSwap(
+  swapId: string,
+  actingUserId: string
+): Promise<SwapRequestDocument> {
   const swap = await loadOpenSwap(swapId);
-  if (swap.type !== SwapType.Swap) throw new AppError(400, "NOT_A_SWAP", "Only swap requests can be rejected");
+  if (swap.type !== SwapType.Swap)
+    throw new AppError(400, "NOT_A_SWAP", "Only swap requests can be rejected");
   if (swap.status !== SwapStatus.PendingTargetAcceptance) {
     throw new AppError(409, "INVALID_STATE", "Swap request is not awaiting target acceptance");
   }
@@ -162,9 +193,13 @@ export async function rejectSwap(swapId: string, actingUserId: string): Promise<
   return swap;
 }
 
-export async function claimDrop(swapId: string, actingUserId: string): Promise<SwapRequestDocument> {
+export async function claimDrop(
+  swapId: string,
+  actingUserId: string
+): Promise<SwapRequestDocument> {
   const swap = await loadOpenSwap(swapId);
-  if (swap.type !== SwapType.Drop) throw new AppError(400, "NOT_A_DROP", "Only drop requests can be claimed");
+  if (swap.type !== SwapType.Drop)
+    throw new AppError(400, "NOT_A_DROP", "Only drop requests can be claimed");
   if (swap.status !== SwapStatus.PendingClaim) {
     throw new AppError(409, "INVALID_STATE", "Drop request is not awaiting a claim");
   }
@@ -194,17 +229,28 @@ export async function claimDrop(swapId: string, actingUserId: string): Promise<S
   await swap.save();
   await auditSwap(swap, before, AuditAction.Update, actingUserId);
 
-  await notifyManagersForSwap(swap, NotificationType.ApprovalNeeded, "Drop claim awaiting approval", "A dropped shift has been claimed and now needs manager approval.");
+  await notifyManagersForSwap(
+    swap,
+    NotificationType.ApprovalNeeded,
+    "Drop claim awaiting approval",
+    "A dropped shift has been claimed and now needs manager approval."
+  );
 
   return swap;
 }
 
-export async function withdrawSwap(swapId: string, actingUserId: string): Promise<SwapRequestDocument> {
+export async function withdrawSwap(
+  swapId: string,
+  actingUserId: string
+): Promise<SwapRequestDocument> {
   const swap = await loadOpenSwap(swapId);
   if (swap.requestedBy.toString() !== actingUserId) {
     throw new AppError(403, "NOT_REQUESTER", "Only the requester may withdraw this request");
   }
-  if (!OPEN_SWAP_STATUSES.includes(swap.status) || swap.status === SwapStatus.PendingManagerApproval) {
+  if (
+    !OPEN_SWAP_STATUSES.includes(swap.status) ||
+    swap.status === SwapStatus.PendingManagerApproval
+  ) {
     throw new AppError(409, "INVALID_STATE", "This request can no longer be withdrawn");
   }
 
@@ -255,12 +301,21 @@ export async function approveSwap(
       if (!shift) throw new AppError(404, "SHIFT_NOT_FOUND", "Shift not found");
 
       if (!isAdmin && !managerLocationIds.includes(shift.locationId.toString())) {
-        throw new AppError(403, "OUT_OF_SCOPE", "This shift's location is outside your managed scope");
+        throw new AppError(
+          403,
+          "OUT_OF_SCOPE",
+          "This shift's location is outside your managed scope"
+        );
       }
 
       const newStaffId =
         swap.type === SwapType.Swap ? swap.targetStaffId?.toString() : swap.claimedBy?.toString();
-      if (!newStaffId) throw new AppError(400, "MISSING_NEW_STAFF", "Swap request has no resolved incoming staff member");
+      if (!newStaffId)
+        throw new AppError(
+          400,
+          "MISSING_NEW_STAFF",
+          "Swap request has no resolved incoming staff member"
+        );
 
       const evaluation = await evaluateAssignment({
         staffId: newStaffId,
@@ -270,9 +325,14 @@ export async function approveSwap(
       });
 
       if (!evaluation.passed) {
-        throw new AppError(422, "CONSTRAINT_VIOLATION", "Incoming staff member fails scheduling constraints", {
-          result: evaluation as unknown as Record<string, unknown>,
-        });
+        throw new AppError(
+          422,
+          "CONSTRAINT_VIOLATION",
+          "Incoming staff member fails scheduling constraints",
+          {
+            result: evaluation as unknown as Record<string, unknown>,
+          }
+        );
       }
 
       const assignmentBefore = originalAssignment.toObject();

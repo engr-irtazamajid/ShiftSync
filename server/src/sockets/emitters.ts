@@ -43,7 +43,10 @@ export function emitAssignmentRemoved(staffId: string, assignment: unknown): voi
   ioRef?.to(userRoom(staffId)).emit(SocketEvent.AssignmentRemoved, assignment);
 }
 
-export function emitAssignmentConflict(managerId: string, payload: AssignmentConflictPayload): void {
+export function emitAssignmentConflict(
+  managerId: string,
+  payload: AssignmentConflictPayload
+): void {
   ioRef?.to(userRoom(managerId)).emit(SocketEvent.AssignmentConflict, payload);
 }
 

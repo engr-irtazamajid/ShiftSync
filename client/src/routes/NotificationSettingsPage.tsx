@@ -29,7 +29,10 @@ export function NotificationSettingsPage() {
     const nextMuted = mutedSet.has(type)
       ? preferences.mutedTypes.filter((t) => t !== type)
       : [...preferences.mutedTypes, type];
-    updatePreferences.mutate({ emailSimEnabled: preferences.emailSimEnabled, mutedTypes: nextMuted });
+    updatePreferences.mutate({
+      emailSimEnabled: preferences.emailSimEnabled,
+      mutedTypes: nextMuted,
+    });
   }
 
   return (
@@ -51,7 +54,10 @@ export function NotificationSettingsPage() {
           <Switch
             checked={preferences.emailSimEnabled}
             onCheckedChange={(checked) =>
-              updatePreferences.mutate({ emailSimEnabled: checked, mutedTypes: preferences.mutedTypes })
+              updatePreferences.mutate({
+                emailSimEnabled: checked,
+                mutedTypes: preferences.mutedTypes,
+              })
             }
           />
         </CardContent>

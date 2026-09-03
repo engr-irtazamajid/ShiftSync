@@ -7,7 +7,9 @@ export function resolveNotificationLink(notification: NotificationDTO): string |
     case "swap_request":
       return "/swaps";
     case "user":
-      return notification.relatedEntityId ? `/staff/${notification.relatedEntityId}/availability` : null;
+      return notification.relatedEntityId
+        ? `/staff/${notification.relatedEntityId}/availability`
+        : null;
     default:
       return null;
   }

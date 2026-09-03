@@ -1,5 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { AssignmentPreviewResult, AuditLogDTO, ConstraintCheckResult, ShiftDTO } from "@shiftsync/shared";
+import type {
+  AssignmentPreviewResult,
+  AuditLogDTO,
+  ConstraintCheckResult,
+  ShiftDTO,
+} from "@shiftsync/shared";
 import { apiClient } from "./client";
 
 export function useShifts(params: { locationId?: string; weekKey?: string; status?: string }) {
@@ -41,7 +46,9 @@ export function useShiftHistory(id: string | undefined) {
   return useQuery({
     queryKey: ["shift-history", id],
     queryFn: async () => {
-      const response = await apiClient.get<{ auditLogs: AuditLogDTO[] }>(`/api/shifts/${id}/history`);
+      const response = await apiClient.get<{ auditLogs: AuditLogDTO[] }>(
+        `/api/shifts/${id}/history`
+      );
       return response.data.auditLogs;
     },
     enabled: Boolean(id),
@@ -150,7 +157,11 @@ export function useUnassignStaff() {
 }
 
 interface ApiErrorBody {
-  error: { code: string; message: string; details?: { result?: ConstraintCheckResult; [key: string]: unknown } };
+  error: {
+    code: string;
+    message: string;
+    details?: { result?: ConstraintCheckResult; [key: string]: unknown };
+  };
 }
 
 export function isConstraintViolationError(

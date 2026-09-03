@@ -1,9 +1,5 @@
 import { AvailabilityType, ConstraintRule } from "@shiftsync/shared";
-import {
-  localTimeOfDayInZone,
-  localWindowExistsOnDate,
-  toLocalDateString,
-} from "../../time/tz";
+import { localTimeOfDayInZone, localWindowExistsOnDate, toLocalDateString } from "../../time/tz";
 import { ConstraintRuleFn, emptyResult } from "../types";
 
 interface Window {
@@ -64,11 +60,7 @@ export const checkAvailability: ConstraintRuleFn = (ctx) => {
 
   const allWindows = datesToCheck.flatMap((d) => windowsForDate(ctx, d, tz));
 
-  const covered = isRangeCovered(
-    ctx.shift.startUtc,
-    ctx.shift.endUtc,
-    allWindows
-  );
+  const covered = isRangeCovered(ctx.shift.startUtc, ctx.shift.endUtc, allWindows);
 
   if (!covered) {
     result.violations.push({

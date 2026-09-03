@@ -5,8 +5,7 @@ export const checkCertification: ConstraintRuleFn = (ctx) => {
   const result = emptyResult();
   const hasActiveCert = ctx.certifications.some(
     (cert) =>
-      cert.locationId.toString() === ctx.shift.locationId.toString() &&
-      cert.revokedAt === null
+      cert.locationId.toString() === ctx.shift.locationId.toString() && cert.revokedAt === null
   );
   if (!hasActiveCert) {
     result.violations.push({

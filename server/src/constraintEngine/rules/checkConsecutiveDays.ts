@@ -24,7 +24,8 @@ export const checkConsecutiveDays: ConstraintRuleFn = (ctx) => {
 
   const workedDates = new Set<string>();
   for (const { shift } of ctx.activeAssignments) {
-    const shiftTz = ctx.locationsById.get(shift.locationId.toString())?.timezone ?? ctx.location.timezone;
+    const shiftTz =
+      ctx.locationsById.get(shift.locationId.toString())?.timezone ?? ctx.location.timezone;
     for (const d of workedDatesFor(shift, shiftTz)) workedDates.add(d);
   }
   for (const d of workedDatesFor(ctx.shift, ctx.location.timezone)) workedDates.add(d);

@@ -17,7 +17,12 @@ interface DenyReasonDialogProps {
   isPending?: boolean;
 }
 
-export function DenyReasonDialog({ open, onOpenChange, onConfirm, isPending }: DenyReasonDialogProps) {
+export function DenyReasonDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+  isPending,
+}: DenyReasonDialogProps) {
   const [reason, setReason] = useState("");
 
   function handleOpenChange(next: boolean) {

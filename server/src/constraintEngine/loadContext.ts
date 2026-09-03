@@ -51,10 +51,17 @@ export async function loadEvaluationContext(input: LoadContextInput): Promise<Ev
     .filter((x): x is AssignmentWithShift => x !== null);
 
   const locationIds = Array.from(
-    new Set([shift.locationId.toString(), ...activeAssignments.map((a) => a.shift.locationId.toString())])
+    new Set([
+      shift.locationId.toString(),
+      ...activeAssignments.map((a) => a.shift.locationId.toString()),
+    ])
   );
-  const locationDocs = await LocationModel.find({ _id: { $in: locationIds } }).session(session ?? null);
-  const locationsById = new Map<string, LocationDocument>(locationDocs.map((l) => [l.id.toString(), l]));
+  const locationDocs = await LocationModel.find({ _id: { $in: locationIds } }).session(
+    session ?? null
+  );
+  const locationsById = new Map<string, LocationDocument>(
+    locationDocs.map((l) => [l.id.toString(), l])
+  );
   locationsById.set(location.id.toString(), location);
 
   const [certifications, availability] = await Promise.all([
