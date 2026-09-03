@@ -11,3 +11,8 @@ export interface AuditLogDTO {
   locationId: string;
   timestamp: string;
 }
+
+export interface AuditLogPageDTO {
+  auditLogs: AuditLogDTO[];
+  nextCursor: string | null;
+}

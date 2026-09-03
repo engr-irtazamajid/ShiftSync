@@ -30,11 +30,17 @@ export function AuditPage() {
   const from = DateTime.now().minus({ days: 30 }).toISODate() ?? "";
   const to = DateTime.now().toISODate() ?? "";
 
-  const { data: entries = [] } = useAuditLog({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useAuditLog({
     locationId: selectedLocationId ?? undefined,
     from,
     to,
   });
+  const entries = data?.pages.flatMap((page) => page.auditLogs) ?? [];
 
   async function handleExport(format: "csv" | "json") {
     setExporting(true);
@@ -114,6 +120,18 @@ export function AuditPage() {
           </table>
         </CardContent>
       </Card>
+
+      {hasNextPage && (
+        <div className="flex justify-center">
+          <Button
+            variant="outline"
+            disabled={isFetchingNextPage}
+            onClick={() => fetchNextPage()}
+          >
+            {isFetchingNextPage ? "Loading..." : "Load more"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

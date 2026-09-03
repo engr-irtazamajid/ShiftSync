@@ -25,7 +25,8 @@ const auditLogSchema = new Schema<AuditLogShape>({
   timestamp: { type: Date, default: Date.now },
 });
 
-auditLogSchema.index({ entityType: 1, entityId: 1, timestamp: 1 });
-auditLogSchema.index({ locationId: 1, timestamp: 1 });
+auditLogSchema.index({ entityType: 1, entityId: 1, timestamp: -1, _id: -1 });
+auditLogSchema.index({ locationId: 1, timestamp: -1, _id: -1 });
+auditLogSchema.index({ timestamp: -1, _id: -1 });
 
 export const AuditLogModel = model<AuditLogShape>("AuditLog", auditLogSchema);

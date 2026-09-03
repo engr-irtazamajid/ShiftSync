@@ -15,33 +15,54 @@ export function StaffPage() {
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold">Staff roster</h1>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {staff.map((member) => (
-          <Link key={member.id} to={`/staff/${member.id}/availability`}>
-            <Card className="h-full transition-colors hover:border-primary/50">
-              <CardContent className="space-y-2 p-4">
-                <p className="font-medium">
-                  {member.firstName} {member.lastName}
-                </p>
-                <p className="text-xs text-muted-foreground">{member.email}</p>
-                <div className="flex flex-wrap gap-1">
-                  {member.skillIds.map((id) => (
-                    <Badge key={id} variant="secondary">
-                      {skillById.get(id) ?? id}
-                    </Badge>
-                  ))}
-                </div>
-                {member.desiredWeeklyHours != null && (
-                  <p className="text-xs text-muted-foreground">
-                    Desired: {member.desiredWeeklyHours}h/week
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
-      {staff.length === 0 && <p className="text-sm text-muted-foreground">No staff members yet.</p>}
+      <Card>
+        <CardContent className="p-0">
+          <table className="w-full text-sm">
+            <thead className="border-b bg-muted/40 text-left">
+              <tr>
+                <th className="p-3 font-medium">Name</th>
+                <th className="p-3 font-medium">Email</th>
+                <th className="p-3 font-medium">Skills</th>
+                <th className="p-3 font-medium">Desired hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {staff.map((member) => (
+                <tr key={member.id} className="border-b last:border-0 hover:bg-muted/30">
+                  <td className="p-0">
+                    <Link
+                      to={`/staff/${member.id}/availability`}
+                      className="block p-3 font-medium"
+                    >
+                      {member.firstName} {member.lastName}
+                    </Link>
+                  </td>
+                  <td className="p-3 text-muted-foreground">{member.email}</td>
+                  <td className="p-3">
+                    <div className="flex flex-wrap gap-1">
+                      {member.skillIds.map((id) => (
+                        <Badge key={id} variant="secondary" className="font-normal">
+                          {skillById.get(id) ?? id}
+                        </Badge>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="p-3 text-muted-foreground">
+                    {member.desiredWeeklyHours != null ? `${member.desiredWeeklyHours}h/week` : "—"}
+                  </td>
+                </tr>
+              ))}
+              {staff.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-muted-foreground">
+                    No staff members yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

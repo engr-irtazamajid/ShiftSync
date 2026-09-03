@@ -6,6 +6,8 @@ import {
   AuditAction,
   AuditEntityType,
   AvailabilityType,
+  NotificationChannel,
+  NotificationType,
   Role,
   ShiftStatus,
   SwapStatus,
@@ -19,6 +21,7 @@ import {
   CertificationModel,
   AvailabilityModel,
   NotificationPreferenceModel,
+  NotificationModel,
   AuditLogModel,
 } from "../src/models";
 import { ShiftModel, computeIsPremium } from "../src/models/Shift";
@@ -363,6 +366,7 @@ async function main(): Promise<void> {
   const ava = findStaff("ava.robinson@coastaleats.com");
   const noah = findStaff("noah.clark@coastaleats.com");
   const isabella = findStaff("isabella.lewis@coastaleats.com");
+  const grace = findStaff("grace.walker@coastaleats.com");
   const priya = findStaff("priya.shah@coastaleats.com");
   const marcus = findStaff("marcus.johnson@coastaleats.com");
   const emily = findStaff("emily.white@coastaleats.com");
@@ -417,6 +421,32 @@ async function main(): Promise<void> {
       });
     }
     return shift;
+  }
+
+  async function notify(opts: {
+    userId: mongoose.Types.ObjectId;
+    type: NotificationType;
+    title: string;
+    body: string;
+    relatedEntityType?: string;
+    relatedEntityId?: mongoose.Types.ObjectId;
+    readAt?: Date | null;
+    createdAt?: Date;
+  }) {
+    const doc = await NotificationModel.create({
+      userId: opts.userId,
+      type: opts.type,
+      title: opts.title,
+      body: opts.body,
+      relatedEntityType: opts.relatedEntityType ?? null,
+      relatedEntityId: opts.relatedEntityId ?? null,
+      readAt: opts.readAt ?? null,
+      channel: NotificationChannel.InApp,
+    });
+    if (opts.createdAt) {
+      await NotificationModel.updateOne({ _id: doc._id }, { createdAt: opts.createdAt });
+    }
+    return doc;
   }
 
   async function assignDirect(
@@ -534,12 +564,21 @@ async function main(): Promise<void> {
     createdBy: managerLA._id,
   });
   const johnAssignment = await assignDirect(johnShift._id, john.id, managerLA._id, downtownLA._id);
-  await SwapRequestModel.create({
+  const johnSwap = await SwapRequestModel.create({
     type: SwapType.Swap,
     assignmentId: johnAssignment._id,
     requestedBy: john.id,
     targetStaffId: maria.id,
     status: SwapStatus.PendingTargetAcceptance,
+  });
+  await notify({
+    userId: maria.id,
+    type: NotificationType.SwapRequested,
+    title: "Shift swap requested",
+    body: "John Diaz wants to swap his Saturday evening bartender shift with you.",
+    relatedEntityType: "swap_request",
+    relatedEntityId: johnSwap._id,
+    createdAt: DateTime.now().minus({ hours: 5 }).toJSDate(),
   });
 
   // Santa Monica current-week published schedule (Pacific time)
@@ -604,13 +643,24 @@ async function main(): Promise<void> {
     managerLA._id,
     santaMonica._id
   );
-  await SwapRequestModel.create({
+  const davidDrop = await SwapRequestModel.create({
     type: SwapType.Drop,
     assignmentId: davidAssignment._id,
     requestedBy: david.id,
     status: SwapStatus.PendingClaim,
     expiresAt: DateTime.now().plus({ hours: 2 }).toUTC().toJSDate(),
   });
+  for (const staffMember of [priya, marcus, emily]) {
+    await notify({
+      userId: staffMember.id,
+      type: NotificationType.DropAvailable,
+      title: "Open shift available to claim",
+      body: "A dishwasher shift at Santa Monica was dropped and is open for claim (expires in 2 hours).",
+      relatedEntityType: "swap_request",
+      relatedEntityId: davidDrop._id,
+      createdAt: DateTime.now().minus({ hours: 3 }).toJSDate(),
+    });
+  }
 
   // A denied historical swap for audit-log richness (last week, Wednesday)
   const pastShift = await createShiftDirect({
@@ -641,6 +691,45 @@ async function main(): Promise<void> {
     after: { status: SwapStatus.Denied, reason: deniedSwap.managerDecisionReason },
     locationId: downtownLA._id,
     timestamp: deniedSwap.managerDecisionAt!,
+  });
+  await notify({
+    userId: maria.id,
+    type: NotificationType.SwapResolved,
+    title: "Swap request denied",
+    body: "Your drop request was denied: No qualified coverage available that evening.",
+    relatedEntityType: "swap_request",
+    relatedEntityId: deniedSwap._id,
+    readAt: DateTime.now().minus({ days: 5 }).toJSDate(),
+    createdAt: deniedSwap.managerDecisionAt!,
+  });
+
+  await notify({
+    userId: sarah.id,
+    type: NotificationType.OvertimeWarning,
+    title: "Approaching weekly overtime",
+    body: "Your scheduled hours this week (44h) exceed the standard 40h threshold at Downtown LA.",
+    relatedEntityType: "user",
+    relatedEntityId: sarah.id,
+    createdAt: DateTime.now().minus({ hours: 12 }).toJSDate(),
+  });
+  await notify({
+    userId: managerLA._id,
+    type: NotificationType.OvertimeWarning,
+    title: "Staff approaching overtime",
+    body: "Sarah Chen is scheduled for 44h this week at Downtown LA, above the standard 40h threshold.",
+    relatedEntityType: "user",
+    relatedEntityId: sarah.id,
+    createdAt: DateTime.now().minus({ hours: 12 }).toJSDate(),
+  });
+
+  await notify({
+    userId: managerLA._id,
+    type: NotificationType.ApprovalNeeded,
+    title: "Swap awaiting your approval",
+    body: "John Diaz and Maria Lopez have a pending shift swap that needs manager review.",
+    relatedEntityType: "swap_request",
+    relatedEntityId: johnSwap._id,
+    createdAt: DateTime.now().minus({ hours: 4 }).toJSDate(),
   });
 
   // Revoked-then-recertified staff/location pair (ambiguity #1 demo)
@@ -773,6 +862,174 @@ async function main(): Promise<void> {
     headcount: 1,
     status: ShiftStatus.Draft,
     createdBy: managerNYC._id,
+  });
+
+  const scheduleAssignedNotifications: Array<{
+    staffId: mongoose.Types.ObjectId;
+    locationName: string;
+    read: boolean;
+  }> = [
+    { staffId: olivia.id, locationName: "Midtown NYC", read: true },
+    { staffId: ethan.id, locationName: "Midtown NYC", read: true },
+    { staffId: sophia.id, locationName: "Midtown NYC", read: false },
+    { staffId: ava.id, locationName: "Brooklyn Heights", read: false },
+    { staffId: noah.id, locationName: "Brooklyn Heights", read: true },
+    { staffId: isabella.id, locationName: "Brooklyn Heights", read: false },
+    { staffId: priya.id, locationName: "Santa Monica", read: true },
+    { staffId: marcus.id, locationName: "Santa Monica", read: false },
+    { staffId: emily.id, locationName: "Santa Monica", read: false },
+  ];
+  for (const entry of scheduleAssignedNotifications) {
+    const createdAt = DateTime.now().minus({ days: 2 }).toJSDate();
+    await notify({
+      userId: entry.staffId,
+      type: NotificationType.SchedulePublished,
+      title: "Schedule published",
+      body: `This week's schedule at ${entry.locationName} has been published.`,
+      relatedEntityType: "shift",
+      readAt: entry.read ? DateTime.now().minus({ days: 1 }).toJSDate() : null,
+      createdAt,
+    });
+  }
+
+  // Downtown LA schedule-published notifications, matching the NYC/Brooklyn/Santa Monica batch above
+  await notify({
+    userId: sarah.id,
+    type: NotificationType.SchedulePublished,
+    title: "Schedule published",
+    body: "This week's schedule at Downtown LA has been published.",
+    relatedEntityType: "shift",
+    readAt: DateTime.now().minus({ days: 1 }).toJSDate(),
+    createdAt: DateTime.now().minus({ days: 2 }).toJSDate(),
+  });
+  await notify({
+    userId: chris.id,
+    type: NotificationType.SchedulePublished,
+    title: "Schedule published",
+    body: "This week's schedule at Downtown LA has been published.",
+    relatedEntityType: "shift",
+    createdAt: DateTime.now().minus({ days: 2 }).toJSDate(),
+  });
+  await notify({
+    userId: maria.id,
+    type: NotificationType.SchedulePublished,
+    title: "Schedule published",
+    body: "This week's schedule at Downtown LA has been published.",
+    relatedEntityType: "shift",
+    createdAt: DateTime.now().minus({ days: 2 }).toJSDate(),
+  });
+
+  // Shift assigned: fires whenever a manager places someone on a new shift
+  await notify({
+    userId: sarah.id,
+    type: NotificationType.ShiftAssigned,
+    title: "You've been assigned a new shift",
+    body: "You were assigned a Friday overnight bartender shift at Downtown LA.",
+    relatedEntityType: "shift",
+    relatedEntityId: overnightShift._id,
+    createdAt: DateTime.now().minus({ days: 3 }).toJSDate(),
+  });
+  await notify({
+    userId: david.id,
+    type: NotificationType.ShiftAssigned,
+    title: "You've been assigned a new shift",
+    body: "You were assigned a dishwasher shift at Santa Monica.",
+    relatedEntityType: "shift",
+    relatedEntityId: soonShift._id,
+    createdAt: DateTime.now().minus({ days: 1 }).toJSDate(),
+  });
+
+  // Shift changed: a manager edited the time/headcount on a published shift after assignment
+  await notify({
+    userId: olivia.id,
+    type: NotificationType.ShiftChanged,
+    title: "Shift details updated",
+    body: "Your Monday bartender shift at Midtown NYC had its headcount updated by your manager.",
+    relatedEntityType: "shift",
+    relatedEntityId: oliviaMonWed._id,
+    readAt: DateTime.now().minus({ hours: 20 }).toJSDate(),
+    createdAt: DateTime.now().minus({ days: 1 }).toJSDate(),
+  });
+
+  // Shift unassigned: staff removed from a shift they were previously on
+  await notify({
+    userId: marcus.id,
+    type: NotificationType.ShiftUnassigned,
+    title: "Removed from a shift",
+    body: "You were removed from Wednesday's server shift at Santa Monica.",
+    relatedEntityType: "shift",
+    relatedEntityId: marcusShift._id,
+    createdAt: DateTime.now().minus({ hours: 30 }).toJSDate(),
+  });
+
+  // Availability changed: a staff member updated their recurring availability
+  await notify({
+    userId: managerLA._id,
+    type: NotificationType.AvailabilityChanged,
+    title: "Staff availability updated",
+    body: "John Diaz updated his weekly availability at Downtown LA.",
+    relatedEntityType: "user",
+    relatedEntityId: john.id,
+    createdAt: DateTime.now().minus({ hours: 18 }).toJSDate(),
+  });
+  await notify({
+    userId: managerMixed._id,
+    type: NotificationType.AvailabilityChanged,
+    title: "Staff availability updated",
+    body: "Grace Walker updated her weekly availability at Santa Monica.",
+    relatedEntityType: "user",
+    relatedEntityId: grace.id,
+    createdAt: DateTime.now().minus({ hours: 10 }).toJSDate(),
+  });
+
+  // Cross-manager coverage so every manager account has at least one notification
+  await notify({
+    userId: managerNYC._id,
+    type: NotificationType.OvertimeWarning,
+    title: "Staff approaching overtime",
+    body: "Ethan Wright is trending toward 40h this week at Midtown NYC.",
+    relatedEntityType: "user",
+    relatedEntityId: ethan.id,
+    createdAt: DateTime.now().minus({ hours: 6 }).toJSDate(),
+  });
+
+  // Admin: cross-location visibility notifications, so the admin account isn't empty
+  await notify({
+    userId: admin._id,
+    type: NotificationType.OvertimeWarning,
+    title: "Staff approaching overtime",
+    body: "Sarah Chen is scheduled for 44h this week at Downtown LA, above the standard 40h threshold.",
+    relatedEntityType: "user",
+    relatedEntityId: sarah.id,
+    createdAt: DateTime.now().minus({ hours: 12 }).toJSDate(),
+  });
+  await notify({
+    userId: admin._id,
+    type: NotificationType.ApprovalNeeded,
+    title: "Swap awaiting manager approval",
+    body: "John Diaz and Maria Lopez have a pending shift swap at Downtown LA awaiting review.",
+    relatedEntityType: "swap_request",
+    relatedEntityId: johnSwap._id,
+    createdAt: DateTime.now().minus({ hours: 4 }).toJSDate(),
+  });
+  await notify({
+    userId: admin._id,
+    type: NotificationType.SwapResolved,
+    title: "Swap request denied",
+    body: "Maria Lopez's drop request at Downtown LA was denied by Jordan Kim.",
+    relatedEntityType: "swap_request",
+    relatedEntityId: deniedSwap._id,
+    readAt: DateTime.now().minus({ days: 5 }).toJSDate(),
+    createdAt: deniedSwap.managerDecisionAt!,
+  });
+  await notify({
+    userId: admin._id,
+    type: NotificationType.SchedulePublished,
+    title: "Schedule published",
+    body: "This week's schedule was published across all 4 locations.",
+    relatedEntityType: "shift",
+    readAt: DateTime.now().minus({ days: 1 }).toJSDate(),
+    createdAt: DateTime.now().minus({ days: 2 }).toJSDate(),
   });
 
   console.log("\nSeed complete.\n");

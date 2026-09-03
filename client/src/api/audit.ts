@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import type { AuditLogDTO } from "@shiftsync/shared";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import type { AuditLogPageDTO } from "@shiftsync/shared";
 import { apiClient } from "./client";
 
 export function useAuditLog(params: {
@@ -9,11 +9,15 @@ export function useAuditLog(params: {
   from?: string;
   to?: string;
 }) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["audit", params],
-    queryFn: async () => {
-      const response = await apiClient.get<{ auditLogs: AuditLogDTO[] }>("/api/audit", { params });
-      return response.data.auditLogs;
+    queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
+      const response = await apiClient.get<AuditLogPageDTO>("/api/audit", {
+        params: { ...params, cursor: pageParam },
+      });
+      return response.data;
     },
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 }

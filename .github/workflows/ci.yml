@@ -66,6 +66,10 @@ jobs:
 
       - name: Run server test suite
         run: npm run test --workspace=server
+        env:
+          MONGO_URI: mongodb://localhost:27017/shiftsync-ci
+          ACCESS_TOKEN_SECRET: ci-access-token-secret
+          REFRESH_TOKEN_SECRET: ci-refresh-token-secret
 
   build:
     name: Build all workspaces

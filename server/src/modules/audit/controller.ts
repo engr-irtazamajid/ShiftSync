@@ -22,10 +22,57 @@ function buildFilter(req: Request): FilterQuery<AuditLogDocument> {
   return filter;
 }
 
+const PAGE_SIZE = 50;
+
+interface Cursor {
+  timestamp: string;
+  id: string;
+}
+
+function decodeCursor(raw: string): Cursor | null {
+  try {
+    const parsed = JSON.parse(Buffer.from(raw, "base64url").toString("utf8"));
+    if (typeof parsed.timestamp === "string" && typeof parsed.id === "string") {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function encodeCursor(timestamp: Date, id: string): string {
+  return Buffer.from(JSON.stringify({ timestamp: timestamp.toISOString(), id }), "utf8").toString(
+    "base64url"
+  );
+}
+
 export async function listAuditLogs(req: Request, res: Response): Promise<void> {
   const filter = buildFilter(req);
-  const logs = await AuditLogModel.find(filter).sort({ timestamp: -1 }).limit(500);
-  res.json({ auditLogs: logs.map(toAuditLogDTO) });
+  const cursorParam = req.query.cursor as string | undefined;
+  const cursor = cursorParam ? decodeCursor(cursorParam) : null;
+  if (cursorParam && !cursor) {
+    throw new AppError(400, "INVALID_CURSOR", "cursor is malformed");
+  }
+
+  if (cursor) {
+    const cursorTimestamp = new Date(cursor.timestamp);
+    filter.$or = [
+      { timestamp: { $lt: cursorTimestamp } },
+      { timestamp: cursorTimestamp, _id: { $lt: cursor.id } },
+    ];
+  }
+
+  const logs = await AuditLogModel.find(filter)
+    .sort({ timestamp: -1, _id: -1 })
+    .limit(PAGE_SIZE + 1);
+
+  const hasMore = logs.length > PAGE_SIZE;
+  const page = hasMore ? logs.slice(0, PAGE_SIZE) : logs;
+  const last = page[page.length - 1];
+  const nextCursor = hasMore && last ? encodeCursor(last.timestamp, last.id.toString()) : null;
+
+  res.json({ auditLogs: page.map(toAuditLogDTO), nextCursor });
 }
 
 function csvEscape(value: unknown): string {
